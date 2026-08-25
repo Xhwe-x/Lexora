@@ -7,6 +7,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 import { MAX_HEARTS } from "@/constants";
@@ -59,7 +60,150 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
     references: [units.id],
   }),
   challenges: many(challenges),
+  lessonWords: many(lessonWords),
 }));
+
+export const words = pgTable("words", {
+  id: serial("id").primaryKey(),
+  word: text("word").notNull().unique(),
+  normalizedWord: text("normalized_word").notNull().unique(),
+  phonetic: text("phonetic"),
+  partOfSpeech: text("part_of_speech"),
+  translationCn: text("translation_cn").notNull(),
+  cefrLevel: text("cefr_level"),
+  difficultyLevel: integer("difficulty_level").notNull().default(1),
+  audioSrc: text("audio_src"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const wordsRelations = relations(words, ({ many }) => ({
+  examples: many(wordExamples),
+  lessonWords: many(lessonWords),
+  userWordProgress: many(userWordProgress),
+  exerciseAttempts: many(exerciseAttempts),
+}));
+
+export const wordExamples = pgTable("word_examples", {
+  id: serial("id").primaryKey(),
+  wordId: integer("word_id")
+    .references(() => words.id, { onDelete: "cascade" })
+    .notNull(),
+  sentence: text("sentence").notNull(),
+  translationCn: text("translation_cn"),
+  difficultyLevel: integer("difficulty_level").notNull().default(1),
+  source: text("source").notNull().default("seed"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const wordExamplesRelations = relations(wordExamples, ({ one }) => ({
+  word: one(words, {
+    fields: [wordExamples.wordId],
+    references: [words.id],
+  }),
+}));
+
+export const lessonWords = pgTable(
+  "lesson_words",
+  {
+    id: serial("id").primaryKey(),
+    lessonId: integer("lesson_id")
+      .references(() => lessons.id, { onDelete: "cascade" })
+      .notNull(),
+    wordId: integer("word_id")
+      .references(() => words.id, { onDelete: "cascade" })
+      .notNull(),
+    order: integer("order").notNull(),
+  },
+  (table) => [
+    uniqueIndex("lesson_words_lesson_id_word_id_unique").on(
+      table.lessonId,
+      table.wordId
+    ),
+  ]
+);
+
+export const lessonWordsRelations = relations(lessonWords, ({ one }) => ({
+  lesson: one(lessons, {
+    fields: [lessonWords.lessonId],
+    references: [lessons.id],
+  }),
+  word: one(words, {
+    fields: [lessonWords.wordId],
+    references: [words.id],
+  }),
+}));
+
+export const userWordProgress = pgTable(
+  "user_word_progress",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    wordId: integer("word_id")
+      .references(() => words.id, { onDelete: "cascade" })
+      .notNull(),
+    masteryLevel: integer("mastery_level").notNull().default(0),
+    meaningCorrect: integer("meaning_correct").notNull().default(0),
+    meaningWrong: integer("meaning_wrong").notNull().default(0),
+    spellingCorrect: integer("spelling_correct").notNull().default(0),
+    spellingWrong: integer("spelling_wrong").notNull().default(0),
+    contextCorrect: integer("context_correct").notNull().default(0),
+    contextWrong: integer("context_wrong").notNull().default(0),
+    correctCount: integer("correct_count").notNull().default(0),
+    wrongCount: integer("wrong_count").notNull().default(0),
+    lastWrongAt: timestamp("last_wrong_at"),
+    lastAnsweredAt: timestamp("last_answered_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_word_progress_user_id_word_id_unique").on(
+      table.userId,
+      table.wordId
+    ),
+  ]
+);
+
+export const userWordProgressRelations = relations(
+  userWordProgress,
+  ({ one }) => ({
+    word: one(words, {
+      fields: [userWordProgress.wordId],
+      references: [words.id],
+    }),
+  })
+);
+
+export const exerciseAttempts = pgTable("exercise_attempts", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  wordId: integer("word_id")
+    .references(() => words.id, { onDelete: "cascade" })
+    .notNull(),
+  lessonId: integer("lesson_id").references(() => lessons.id, {
+    onDelete: "set null",
+  }),
+  exerciseType: text("exercise_type").notNull(),
+  userAnswer: text("user_answer"),
+  correctAnswer: text("correct_answer").notNull(),
+  correct: boolean("correct").notNull(),
+  responseMs: integer("response_ms"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const exerciseAttemptsRelations = relations(
+  exerciseAttempts,
+  ({ one }) => ({
+    word: one(words, {
+      fields: [exerciseAttempts.wordId],
+      references: [words.id],
+    }),
+    lesson: one(lessons, {
+      fields: [exerciseAttempts.lessonId],
+      references: [lessons.id],
+    }),
+  })
+);
 
 export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
 
