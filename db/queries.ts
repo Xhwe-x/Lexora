@@ -3,10 +3,7 @@ import { cache } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 
-import {
-  getVocabularyLessonPercentage as calculateVocabularyLessonPercentage,
-  isVocabularyLessonCompleted,
-} from "@/lib/vocabulary/lesson-progress";
+import { buildLearningPath } from "@/lib/learning-path";
 
 import db from "./drizzle";
 import {
@@ -43,11 +40,11 @@ export const getUserProgress = cache(async () => {
   return data;
 });
 
-export const getUnits = cache(async () => {
+export const getLearningPath = cache(async () => {
   const { userId } = await auth();
   const userProgress = await getUserProgress();
 
-  if (!userId || !userProgress?.activeCourseId) return [];
+  if (!userId || !userProgress?.activeCourseId) return null;
 
   const data = await db.query.units.findMany({
     where: eq(units.courseId, userProgress.activeCourseId),
@@ -81,33 +78,11 @@ export const getUnits = cache(async () => {
     },
   });
 
-  const normalizedData = data.map((unit) => {
-    const lessonsWithCompletedStatus = unit.lessons.map((lesson) => {
-      if (lesson.lessonWords.length > 0) {
-        return {
-          ...lesson,
-          completed: isVocabularyLessonCompleted(lesson.lessonWords),
-        };
-      }
+  return buildLearningPath(data);
+});
 
-      if (lesson.challenges.length === 0)
-        return { ...lesson, completed: false };
-
-      const allCompletedChallenges = lesson.challenges.every((challenge) => {
-        return (
-          challenge.challengeProgress &&
-          challenge.challengeProgress.length > 0 &&
-          challenge.challengeProgress.every((progress) => progress.completed)
-        );
-      });
-
-      return { ...lesson, completed: allCompletedChallenges };
-    });
-
-    return { ...unit, lessons: lessonsWithCompletedStatus };
-  });
-
-  return normalizedData;
+export const getUnits = cache(async () => {
+  return (await getLearningPath())?.units ?? [];
 });
 
 export const getCourseById = cache(async (courseId: number) => {
@@ -129,62 +104,13 @@ export const getCourseById = cache(async (courseId: number) => {
 });
 
 export const getCourseProgress = cache(async () => {
-  const { userId } = await auth();
-  const userProgress = await getUserProgress();
+  const learningPath = await getLearningPath();
 
-  if (!userId || !userProgress?.activeCourseId) return null;
-
-  const unitsInActiveCourse = await db.query.units.findMany({
-    orderBy: (units, { asc }) => [asc(units.order)],
-    where: eq(units.courseId, userProgress.activeCourseId),
-    with: {
-      lessons: {
-        orderBy: (lessons, { asc }) => [asc(lessons.order)],
-        with: {
-          unit: true,
-          lessonWords: {
-            orderBy: (lessonWords, { asc }) => [asc(lessonWords.order)],
-            with: {
-              word: {
-                with: {
-                  userWordProgress: {
-                    where: eq(userWordProgress.userId, userId),
-                  },
-                },
-              },
-            },
-          },
-          challenges: {
-            with: {
-              challengeProgress: {
-                where: eq(challengeProgress.userId, userId),
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const firstUncompletedLesson = unitsInActiveCourse
-    .flatMap((unit) => unit.lessons)
-    .find((lesson) => {
-      if (lesson.lessonWords.length > 0) {
-        return !isVocabularyLessonCompleted(lesson.lessonWords);
-      }
-
-      return lesson.challenges.some((challenge) => {
-        return (
-          !challenge.challengeProgress ||
-          challenge.challengeProgress.length === 0 ||
-          challenge.challengeProgress.some((progress) => !progress.completed)
-        );
-      });
-    });
+  if (!learningPath) return null;
 
   return {
-    activeLesson: firstUncompletedLesson,
-    activeLessonId: firstUncompletedLesson?.id,
+    activeLesson: learningPath.activeLesson,
+    activeLessonId: learningPath.activeLessonId,
   };
 });
 
@@ -269,30 +195,7 @@ export const getLesson = cache(async (id?: number) => {
 });
 
 export const getLessonPercentage = cache(async () => {
-  const courseProgress = await getCourseProgress();
-
-  if (!courseProgress?.activeLessonId) return 0;
-
-  const mode = await getLessonMode(courseProgress.activeLessonId);
-
-  if (mode === "VOCABULARY") {
-    const lesson = await getVocabularyLesson(courseProgress.activeLessonId);
-    return calculateVocabularyLessonPercentage(lesson?.lessonWords ?? []);
-  }
-
-  const lesson = await getLesson(courseProgress?.activeLessonId);
-
-  if (!lesson) return 0;
-
-  const completedChallenges = lesson.challenges.filter(
-    (challenge) => challenge.completed
-  );
-
-  const percentage = Math.round(
-    (completedChallenges.length / lesson.challenges.length) * 100
-  );
-
-  return percentage;
+  return (await getLearningPath())?.activeLessonPercentage ?? 0;
 });
 
 export const getUserSubscription = cache(async () => {

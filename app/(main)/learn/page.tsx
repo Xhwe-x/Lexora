@@ -7,9 +7,7 @@ import { Quests } from "@/components/quests";
 import { StickyWrapper } from "@/components/sticky-wrapper";
 import { UserProgress } from "@/components/user-progress";
 import {
-  getCourseProgress,
-  getLessonPercentage,
-  getUnits,
+  getLearningPath,
   getUserProgress,
   getUserSubscription,
 } from "@/db/queries";
@@ -21,26 +19,16 @@ const LearnPage = async () => {
   await auth.protect();
 
   const userProgressData = getUserProgress();
-  const courseProgressData = getCourseProgress();
-  const lessonPercentageData = getLessonPercentage();
-  const unitsData = getUnits();
+  const learningPathData = getLearningPath();
   const userSubscriptionData = getUserSubscription();
 
-  const [
-    userProgress,
-    units,
-    courseProgress,
-    lessonPercentage,
-    userSubscription,
-  ] = await Promise.all([
+  const [userProgress, learningPath, userSubscription] = await Promise.all([
     userProgressData,
-    unitsData,
-    courseProgressData,
-    lessonPercentageData,
+    learningPathData,
     userSubscriptionData,
   ]);
 
-  if (!courseProgress || !userProgress || !userProgress.activeCourse)
+  if (!learningPath || !userProgress || !userProgress.activeCourse)
     redirect("/courses");
 
   const isPro = !!userSubscription?.isActive;
@@ -60,7 +48,7 @@ const LearnPage = async () => {
       </StickyWrapper>
       <FeedWrapper>
         <Header title={userProgress.activeCourse.title} />
-        {units.map((unit) => (
+        {learningPath.units.map((unit) => (
           <div key={unit.id} className="mb-10">
             <Unit
               id={unit.id}
@@ -68,8 +56,8 @@ const LearnPage = async () => {
               description={unit.description}
               title={unit.title}
               lessons={unit.lessons}
-              activeLesson={courseProgress.activeLesson}
-              activeLessonPercentage={lessonPercentage}
+              activeLesson={learningPath.activeLesson}
+              activeLessonPercentage={learningPath.activeLessonPercentage}
             />
           </div>
         ))}
