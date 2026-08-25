@@ -58,7 +58,9 @@ export function VocabularyLesson({
   const [incorrectAudio, _incorrectAudio, incorrectControls] = useAudio({
     src: "/incorrect.wav",
   });
-  const [finishAudio] = useAudio({ src: "/finish.mp3", autoPlay: true });
+  const [finishAudio, , finishControls] = useAudio({
+    src: "/finish.mp3",
+  });
   const startedAt = useRef(0);
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export function VocabularyLesson({
     useState<VocabularyFeedbackState>("answering");
   const [hearts, setHearts] = useState(initialHearts);
   const [xpAwarded, setXpAwarded] = useState(0);
+  const [lastXpAwarded, setLastXpAwarded] = useState(0);
   const [formalAttempts, setFormalAttempts] = useState(0);
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [masteryLevels, setMasteryLevels] = useState(initialMasteryLevels);
@@ -88,12 +91,17 @@ export function VocabularyLesson({
       ? 0
       : Math.min(100, (activeIndex / exercises.length) * 100);
 
+  useEffect(() => {
+    if (!exercise) void finishControls.play();
+  }, [exercise, finishControls]);
+
   const resetForNextExercise = () => {
     setActiveIndex((index) => index + 1);
     setAnswer("");
     setSubmittedAnswer("");
     setCorrectAnswer("");
     setFeedbackState("answering");
+    setLastXpAwarded(0);
     startedAt.current = Date.now();
   };
 
@@ -139,6 +147,7 @@ export function VocabularyLesson({
         setFormalAttempts((count) => count + 1);
         setHearts(response.hearts);
         setXpAwarded((total) => total + response.xpAwarded);
+        setLastXpAwarded(response.xpAwarded);
         setMasteryLevels((levels) => ({
           ...levels,
           [exercise.wordId]: response.masteryLevel,
@@ -251,6 +260,7 @@ export function VocabularyLesson({
     <>
       {correctAudio}
       {incorrectAudio}
+      {finishAudio}
       <Header
         hearts={hearts}
         percentage={percentage}
@@ -274,6 +284,7 @@ export function VocabularyLesson({
 
           {exercise.type === "MEANING_CHOICE" && (
             <MeaningChoice
+              prompt={exercise.prompt}
               options={exercise.options ?? []}
               selectedAnswer={answer}
               correctAnswer={correctAnswer}
@@ -285,11 +296,14 @@ export function VocabularyLesson({
           {exercise.type === "SPELLING" && (
             <SpellingInput
               translation={exercise.prompt}
+              targetWord={currentWord.word}
               value={answer}
               disabled={
                 pending || (!correcting && feedbackState !== "answering")
               }
               correcting={correcting}
+              submittedAnswer={submittedAnswer}
+              correctAnswer={correctAnswer}
               onChange={setAnswer}
               onSubmit={handleAction}
             />
@@ -298,11 +312,14 @@ export function VocabularyLesson({
             <ContextInput
               prompt={exercise.prompt}
               translation={currentExample?.translationCn ?? null}
+              targetWord={currentWord.word}
               value={answer}
               disabled={
                 pending || (!correcting && feedbackState !== "answering")
               }
               correcting={correcting}
+              submittedAnswer={submittedAnswer}
+              correctAnswer={correctAnswer}
               onChange={setAnswer}
               onSubmit={handleAction}
             />
@@ -323,6 +340,8 @@ export function VocabularyLesson({
             state={feedbackState}
             userAnswer={submittedAnswer}
             correctAnswer={correctAnswer}
+            xpAwarded={lastXpAwarded}
+            hearts={hearts}
           />
           <Button
             className="ml-auto shrink-0"
