@@ -21,11 +21,13 @@ export const Card = ({
   isActive,
 }: CardProps) => {
   return (
-    <div
+    <button
+      type="button"
+      disabled={disabled}
       onClick={() => onClick(id)}
       className={cn(
-        "flex h-full min-h-[217px] min-w-[200px] cursor-pointer flex-col items-center justify-between rounded-xl border-2 border-b-[4px] p-3 pb-6 hover:bg-black/5 active:border-b-2",
-        disabled && "pointer-events-none opacity-50"
+        "flex h-full min-h-[217px] min-w-[200px] cursor-pointer flex-col items-center justify-between rounded-2xl border border-slate-200 bg-white/85 p-3 pb-6 shadow-sm transition-[transform,box-shadow,border-color] hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lg active:translate-y-0",
+        disabled && "cursor-wait opacity-50"
       )}
     >
       <div className="flex min-h-[24px] w-full items-center justify-end">
@@ -45,6 +47,6 @@ export const Card = ({
       />
 
       <p className="mt-3 text-center font-bold text-neutral-700">{title}</p>
-    </div>
+    </button>
   );
 };

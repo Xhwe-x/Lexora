@@ -15,9 +15,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useExitModal } from "@/store/use-exit-modal";
+import { useI18n } from "@/lib/i18n/provider";
 
 export const ExitModal = () => {
   const router = useRouter();
+  const { t } = useI18n();
   const [isClient, setIsClient] = useState(false);
   const { isOpen, close } = useExitModal();
 
@@ -32,18 +34,19 @@ export const ExitModal = () => {
           <div className="mb-5 flex w-full items-center justify-center">
             <Image
               src="/mascot_sad.svg"
-              alt="Mascot Sad"
+              alt=""
+              aria-hidden="true"
               height={80}
               width={80}
             />
           </div>
 
           <DialogTitle className="text-center text-2xl font-bold">
-            Wait, don&apos;t go!
+            {t("modal.exitTitle")}
           </DialogTitle>
 
           <DialogDescription className="text-center text-base">
-            You&apos;re about to leave the lesson. Are you sure?
+            {t("modal.exitDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -55,7 +58,7 @@ export const ExitModal = () => {
               size="lg"
               onClick={close}
             >
-              Keep learning
+              {t("modal.keepLearning")}
             </Button>
 
             <Button
@@ -67,7 +70,7 @@ export const ExitModal = () => {
                 router.push("/learn");
               }}
             >
-              End session
+              {t("modal.endSession")}
             </Button>
           </div>
         </DialogFooter>

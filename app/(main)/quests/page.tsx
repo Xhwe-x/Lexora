@@ -9,9 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { UserProgress } from "@/components/user-progress";
 import { QUESTS } from "@/constants";
 import { getUserProgress, getUserSubscription } from "@/db/queries";
+import { translate } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 const QuestsPage = async () => {
   await auth.protect();
+  const locale = await getRequestLocale();
 
   const userProgressData = getUserProgress();
   const userSubscriptionData = getUserSubscription();
@@ -39,13 +42,18 @@ const QuestsPage = async () => {
 
       <FeedWrapper>
         <div className="flex w-full flex-col items-center">
-          <Image src="/quests.svg" alt="Quests" height={90} width={90} />
+          <Image
+            src="/quests.svg"
+            alt={translate(locale, "quests.title")}
+            height={90}
+            width={90}
+          />
 
           <h1 className="my-6 text-center text-2xl font-bold text-neutral-800">
-            Quests
+            {translate(locale, "quests.title")}
           </h1>
           <p className="mb-6 text-center text-lg text-muted-foreground">
-            Complete quests by earning points.
+            {translate(locale, "quests.description")}
           </p>
 
           <ul className="w-full">
@@ -59,14 +67,14 @@ const QuestsPage = async () => {
                 >
                   <Image
                     src="/points.svg"
-                    alt="Points"
+                    alt={translate(locale, "common.points")}
                     width={60}
                     height={60}
                   />
 
                   <div className="flex w-full flex-col gap-y-2">
                     <p className="text-xl font-bold text-neutral-700">
-                      {quest.title}
+                      {translate(locale, "quests.earn")} {quest.value} XP
                     </p>
 
                     <Progress value={progress} className="h-3" />

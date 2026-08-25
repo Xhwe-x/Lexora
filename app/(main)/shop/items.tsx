@@ -9,6 +9,7 @@ import { refillHearts } from "@/actions/user-progress";
 import { createStripeUrl } from "@/actions/user-subscription";
 import { Button } from "@/components/ui/button";
 import { MAX_HEARTS, POINTS_TO_REFILL } from "@/constants";
+import { useI18n } from "@/lib/i18n/provider";
 
 type ItemsProps = {
   hearts: number;
@@ -23,28 +24,29 @@ export const Items = ({
   hasActiveSubscription,
   stripeEnabled,
 }: ItemsProps) => {
+  const { t } = useI18n();
   const [pending, startTransition] = useTransition();
 
   const onRefillHearts = () => {
     if (pending || hearts === MAX_HEARTS || points < POINTS_TO_REFILL) return;
 
     startTransition(() => {
-      refillHearts().catch(() => toast.error("Something went wrong."));
+      refillHearts().catch(() => toast.error(t("common.errorRetry")));
     });
   };
 
   const onUpgrade = () => {
     if (!stripeEnabled) {
-      toast.error("Stripe is not configured for this local environment.");
+      toast.error(t("shop.stripeUnavailable"));
       return;
     }
 
-    toast.loading("Redirecting to checkout...");
+    toast.loading(t("shop.redirecting"));
     startTransition(() => {
       createStripeUrl()
         .then((response) => {
           if ("error" in response && response.error === "stripe_unavailable") {
-            toast.error("Stripe is not configured for this local environment.");
+            toast.error(t("shop.stripeUnavailable"));
             return;
           }
 
@@ -52,7 +54,7 @@ export const Items = ({
             window.location.href = response.data;
           }
         })
-        .catch(() => toast.error("Something went wrong."));
+        .catch(() => toast.error(t("common.errorRetry")));
     });
   };
 
@@ -63,7 +65,7 @@ export const Items = ({
 
         <div className="flex-1">
           <p className="text-base font-bold text-neutral-700 lg:text-xl">
-            Refill hearts
+            {t("shop.refillHearts")}
           </p>
         </div>
 
@@ -77,7 +79,7 @@ export const Items = ({
           }
         >
           {hearts === MAX_HEARTS ? (
-            "full"
+            t("common.full")
           ) : (
             <div className="flex items-center">
               <Image src="/points.svg" alt="Points" height={20} width={20} />
@@ -93,7 +95,7 @@ export const Items = ({
 
         <div className="flex-1">
           <p className="text-base font-bold text-neutral-700 lg:text-xl">
-            Unlimited hearts
+            {t("shop.unlimitedHearts")}
           </p>
         </div>
 
@@ -103,10 +105,10 @@ export const Items = ({
           aria-disabled={pending || !stripeEnabled}
         >
           {!stripeEnabled
-            ? "unavailable"
+            ? t("common.unavailable")
             : hasActiveSubscription
-              ? "settings"
-              : "upgrade"}
+              ? t("common.settings")
+              : t("common.upgrade")}
         </Button>
       </div>
     </ul>

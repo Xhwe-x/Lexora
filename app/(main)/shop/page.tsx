@@ -8,11 +8,14 @@ import { StickyWrapper } from "@/components/sticky-wrapper";
 import { UserProgress } from "@/components/user-progress";
 import { getUserProgress, getUserSubscription } from "@/db/queries";
 import { isStripeKeyConfigured } from "@/lib/stripe-config";
+import { translate } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 import { Items } from "./items";
 
 const ShopPage = async () => {
   await auth.protect();
+  const locale = await getRequestLocale();
 
   const userProgressData = getUserProgress();
   const userSubscriptionData = getUserSubscription();
@@ -43,17 +46,17 @@ const ShopPage = async () => {
         <div className="flex w-full flex-col items-center">
           <Image
             src="/shop.svg"
-            alt="Shop"
+            alt={translate(locale, "shop.title")}
             height={90}
             width={90}
             loading="eager"
           />
 
           <h1 className="my-6 text-center text-2xl font-bold text-neutral-800">
-            Shop
+            {translate(locale, "shop.title")}
           </h1>
           <p className="mb-6 text-center text-lg text-muted-foreground">
-            Spend your points on cool stuff.
+            {translate(locale, "shop.description")}
           </p>
 
           <Items

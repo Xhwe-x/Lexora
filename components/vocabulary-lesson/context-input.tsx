@@ -1,4 +1,5 @@
 import { TypingReview, WordInputTrack } from "./word-input-track";
+import { useI18n } from "@/lib/i18n/provider";
 
 type ContextInputProps = {
   prompt: string;
@@ -25,6 +26,8 @@ export function ContextInput({
   onChange,
   onSubmit,
 }: ContextInputProps) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border-2 bg-slate-50 px-5 py-6">
@@ -41,7 +44,11 @@ export function ContextInput({
         <TypingReview value={submittedAnswer} correctAnswer={correctAnswer} />
       )}
       <WordInputTrack
-        label={correcting ? "请重新输入正确单词" : "填写空缺单词"}
+        label={
+          correcting
+            ? t("vocabulary.correctionTitle")
+            : t("vocabulary.fillMissing")
+        }
         value={value}
         targetLength={targetWord.length}
         disabled={disabled}

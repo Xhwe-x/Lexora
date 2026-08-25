@@ -3,6 +3,7 @@ import {
   buildTypingFeedback,
   type TypingFeedbackCell,
 } from "@/lib/vocabulary/typing-feedback";
+import { useI18n } from "@/lib/i18n/provider";
 
 type WordInputTrackProps = {
   label: string;
@@ -21,6 +22,7 @@ export function WordInputTrack({
   onChange,
   onSubmit,
 }: WordInputTrackProps) {
+  const { t } = useI18n();
   const cells = buildTypingFeedback({ value, targetLength });
 
   return (
@@ -54,12 +56,10 @@ export function WordInputTrack({
         />
       </div>
       <div className="flex items-center justify-between text-xs font-semibold text-neutral-400">
-        <span>{value.length} letters typed</span>
         <span>
-          Press{" "}
-          <kbd className="rounded border bg-slate-50 px-1.5 py-0.5">Enter</kbd>{" "}
-          to check
+          {value.length} {t("vocabulary.lettersTyped")}
         </span>
+        <span>{t("vocabulary.pressEnter")}</span>
       </div>
     </label>
   );
@@ -71,6 +71,7 @@ type TypingReviewProps = {
 };
 
 export function TypingReview({ value, correctAnswer }: TypingReviewProps) {
+  const { t } = useI18n();
   const cells = buildTypingFeedback({
     value,
     targetLength: correctAnswer.length,
@@ -81,11 +82,11 @@ export function TypingReview({ value, correctAnswer }: TypingReviewProps) {
   return (
     <div className="rounded-2xl border-2 border-rose-200 bg-rose-50/70 p-4">
       <p className="mb-3 text-xs font-bold uppercase tracking-wider text-rose-500">
-        First attempt review
+        {t("vocabulary.firstReview")}
       </p>
       <div
         className="flex flex-wrap justify-center gap-1.5"
-        aria-label="Spelling review"
+        aria-label={t("vocabulary.spellingReview")}
       >
         {cells.map((cell) => (
           <LetterCell key={cell.index} cell={cell} compact />

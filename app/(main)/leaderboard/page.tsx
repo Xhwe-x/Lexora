@@ -14,9 +14,12 @@ import {
   getUserProgress,
   getUserSubscription,
 } from "@/db/queries";
+import { translate } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 const LeaderboardPage = async () => {
   await auth.protect();
+  const locale = await getRequestLocale();
 
   const userProgressData = getUserProgress();
   const userSubscriptionData = getUserSubscription();
@@ -49,16 +52,16 @@ const LeaderboardPage = async () => {
         <div className="flex w-full flex-col items-center">
           <Image
             src="/leaderboard.svg"
-            alt="Leaderboard"
+            alt={translate(locale, "leaderboard.title")}
             height={90}
             width={90}
           />
 
           <h1 className="my-6 text-center text-2xl font-bold text-neutral-800">
-            Leaderboard
+            {translate(locale, "leaderboard.title")}
           </h1>
           <p className="mb-6 text-center text-lg text-muted-foreground">
-            See where you stand among other learners in the community.
+            {translate(locale, "leaderboard.description")}
           </p>
 
           <Separator className="mb-4 h-0.5 rounded-full" />

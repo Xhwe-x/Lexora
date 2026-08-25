@@ -1,4 +1,5 @@
 import { TypingReview, WordInputTrack } from "./word-input-track";
+import { useI18n } from "@/lib/i18n/provider";
 
 type SpellingInputProps = {
   translation: string;
@@ -23,6 +24,8 @@ export function SpellingInput({
   onChange,
   onSubmit,
 }: SpellingInputProps) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border-2 bg-slate-50 px-5 py-6 text-center text-xl font-bold text-neutral-700">
@@ -32,7 +35,11 @@ export function SpellingInput({
         <TypingReview value={submittedAnswer} correctAnswer={correctAnswer} />
       )}
       <WordInputTrack
-        label={correcting ? "请重新输入正确单词" : "请输入英文"}
+        label={
+          correcting
+            ? t("vocabulary.correctionTitle")
+            : t("vocabulary.inputEnglish")
+        }
         value={value}
         targetLength={targetWord.length}
         disabled={disabled}

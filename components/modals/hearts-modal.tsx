@@ -15,9 +15,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useHeartsModal } from "@/store/use-hearts-modal";
+import { useI18n } from "@/lib/i18n/provider";
 
 export const HeartsModal = () => {
   const router = useRouter();
+  const { t } = useI18n();
   const [isClient, setIsClient] = useState(false);
   const { isOpen, close } = useHeartsModal();
 
@@ -25,7 +27,7 @@ export const HeartsModal = () => {
 
   const onClick = () => {
     close();
-    router.push("/store");
+    router.push("/shop");
   };
 
   if (!isClient) return null;
@@ -37,18 +39,19 @@ export const HeartsModal = () => {
           <div className="mb-5 flex w-full items-center justify-center">
             <Image
               src="/mascot_bad.svg"
-              alt="Mascot Bad"
+              alt=""
+              aria-hidden="true"
               height={80}
               width={80}
             />
           </div>
 
           <DialogTitle className="text-center text-2xl font-bold">
-            You ran out of hearts!
+            {t("modal.heartsTitle")}
           </DialogTitle>
 
           <DialogDescription className="text-center text-base">
-            Get Pro for unlimited hearts, or purchase them in the store.
+            {t("modal.heartsDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -60,7 +63,7 @@ export const HeartsModal = () => {
               size="lg"
               onClick={onClick}
             >
-              Get unlimited hearts
+              {t("modal.getUnlimitedHearts")}
             </Button>
 
             <Button
@@ -69,7 +72,7 @@ export const HeartsModal = () => {
               size="lg"
               onClick={close}
             >
-              No thanks
+              {t("modal.noThanks")}
             </Button>
           </div>
         </DialogFooter>

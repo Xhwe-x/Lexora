@@ -14,6 +14,7 @@ import { MAX_HEARTS } from "@/constants";
 import { challengeOptions, challenges, userSubscription } from "@/db/schema";
 import { useHeartsModal } from "@/store/use-hearts-modal";
 import { usePracticeModal } from "@/store/use-practice-modal";
+import { useI18n } from "@/lib/i18n/provider";
 
 import { Challenge } from "./challenge";
 import { Footer } from "./footer";
@@ -43,6 +44,7 @@ export const Quiz = ({
   initialLessonChallenges,
   userSubscription,
 }: QuizProps) => {
+  const { t } = useI18n();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [correctAudio, _c, correctControls] = useAudio({ src: "/correct.wav" });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,7 +134,7 @@ export const Quiz = ({
               setHearts((prev) => Math.min(prev + 1, MAX_HEARTS));
             }
           })
-          .catch(() => toast.error("Something went wrong. Please try again."));
+          .catch(() => toast.error(t("common.errorRetry")));
       });
     } else {
       startTransition(() => {
@@ -148,7 +150,7 @@ export const Quiz = ({
 
             if (!response?.error) setHearts((prev) => Math.max(prev - 1, 0));
           })
-          .catch(() => toast.error("Something went wrong. Please try again."));
+          .catch(() => toast.error(t("common.errorRetry")));
       });
     }
   };
@@ -164,10 +166,14 @@ export const Quiz = ({
           width={width}
           height={height}
         />
-        <div className="mx-auto flex h-full max-w-lg flex-col items-center justify-center gap-y-4 text-center lg:gap-y-8">
+        <div
+          id="main-content"
+          className="mx-auto flex h-full max-w-lg flex-col items-center justify-center gap-y-4 text-center lg:gap-y-8"
+        >
           <Image
             src="/finish.svg"
-            alt="Finish"
+            alt=""
+            aria-hidden="true"
             className="hidden lg:block"
             height={100}
             width={100}
@@ -175,14 +181,15 @@ export const Quiz = ({
 
           <Image
             src="/finish.svg"
-            alt="Finish"
+            alt=""
+            aria-hidden="true"
             className="block lg:hidden"
             height={100}
             width={100}
           />
 
           <h1 className="text-lg font-bold text-neutral-700 lg:text-3xl">
-            Great job! <br /> You&apos;ve completed the lesson.
+            {t("legacy.completeTitle")}
           </h1>
 
           <div className="flex w-full items-center gap-x-4">
@@ -204,9 +211,7 @@ export const Quiz = ({
   }
 
   const title =
-    challenge.type === "ASSIST"
-      ? "Select the correct meaning"
-      : challenge.question;
+    challenge.type === "ASSIST" ? t("legacy.assistTitle") : challenge.question;
 
   return (
     <>
@@ -218,7 +223,7 @@ export const Quiz = ({
         hasActiveSubscription={!!userSubscription?.isActive}
       />
 
-      <div className="flex-1">
+      <main id="main-content" className="flex-1">
         <div className="flex h-full items-center justify-center">
           <div className="flex w-full flex-col gap-y-12 px-6 lg:min-h-[350px] lg:w-[600px] lg:px-0">
             <h1 className="text-center text-lg font-bold text-neutral-700 lg:text-start lg:text-3xl">
@@ -241,10 +246,11 @@ export const Quiz = ({
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer
         disabled={pending || !selectedOption}
+        pending={pending}
         status={status}
         onCheck={onContinue}
       />

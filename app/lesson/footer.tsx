@@ -2,12 +2,14 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { useKey, useMedia } from "react-use";
 
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 
 type FooterProps = {
   onCheck: () => void;
   status: "correct" | "wrong" | "none" | "completed";
   disabled?: boolean;
+  pending?: boolean;
   lessonId?: number;
 };
 
@@ -15,8 +17,10 @@ export const Footer = ({
   onCheck,
   status,
   disabled,
+  pending = false,
   lessonId,
 }: FooterProps) => {
+  const { t } = useI18n();
   useKey("Enter", onCheck, {}, [onCheck]);
   const isMobile = useMedia("(max-width: 1024px)");
 
@@ -32,14 +36,14 @@ export const Footer = ({
         {status === "correct" && (
           <div className="flex items-center text-base font-bold text-green-500 lg:text-2xl">
             <CheckCircle className="mr-4 h-6 w-6 lg:h-10 lg:w-10" />
-            Nicely done!
+            {t("common.nicelyDone")}
           </div>
         )}
 
         {status === "wrong" && (
           <div className="flex items-center text-base font-bold text-rose-500 lg:text-2xl">
             <XCircle className="mr-4 h-6 w-6 lg:h-10 lg:w-10" />
-            Try again.
+            {t("common.tryAgain")}
           </div>
         )}
 
@@ -49,7 +53,7 @@ export const Footer = ({
             size={isMobile ? "sm" : "lg"}
             onClick={() => (window.location.href = `/lesson/${lessonId}`)}
           >
-            Practice again
+            {t("common.practiceAgain")}
           </Button>
         )}
 
@@ -61,10 +65,11 @@ export const Footer = ({
           size={isMobile ? "sm" : "lg"}
           variant={status === "wrong" ? "danger" : "secondary"}
         >
-          {status === "none" && "Check"}
-          {status === "correct" && "Next"}
-          {status === "wrong" && "Retry"}
-          {status === "completed" && "Continue"}
+          {pending && t("common.working")}
+          {!pending && status === "none" && t("common.check")}
+          {!pending && status === "correct" && t("common.next")}
+          {!pending && status === "wrong" && t("common.retry")}
+          {!pending && status === "completed" && t("common.continue")}
         </Button>
       </div>
     </footer>

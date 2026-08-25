@@ -24,6 +24,7 @@ import {
 } from "@/lib/vocabulary/session-builder";
 import type { VocabularyExercise } from "@/lib/vocabulary/types";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 import { ContextInput } from "./context-input";
 import { FeedbackPanel } from "./feedback-panel";
@@ -47,6 +48,7 @@ export function VocabularyLesson({
   words,
   initialMasteryLevels,
 }: VocabularyLessonProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const { width, height } = useWindowSize();
   const [pending, startTransition] = useTransition();
@@ -119,7 +121,7 @@ export function VocabularyLesson({
 
     if (feedbackState === "correcting") {
       if (!isCorrectionAnswerAccepted(answer, correctAnswer)) {
-        toast.error("请准确输入上方显示的正确单词。");
+        toast.error(t("vocabulary.correctionError"));
         return;
       }
 
@@ -173,7 +175,7 @@ export function VocabularyLesson({
         setAnswer(exercise.type === "MEANING_CHOICE" ? formalAnswer : "");
         void incorrectControls.play();
       } catch {
-        toast.error("提交失败，请稍后重试。");
+        toast.error(t("vocabulary.submitError"));
       }
     });
   };
@@ -194,14 +196,23 @@ export function VocabularyLesson({
           width={width}
           height={height}
         />
-        <div className="mx-auto flex h-full w-full max-w-2xl flex-col items-center justify-center gap-y-6 px-6 text-center">
-          <Image src="/finish.svg" alt="Finish" height={110} width={110} />
+        <div
+          id="main-content"
+          className="mx-auto flex h-full w-full max-w-2xl flex-col items-center justify-center gap-y-6 px-6 text-center"
+        >
+          <Image
+            src="/finish.svg"
+            alt=""
+            aria-hidden="true"
+            height={110}
+            width={110}
+          />
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-green-500">
-              Lesson Complete
+              {t("common.lessonComplete")}
             </p>
             <h1 className="mt-2 text-3xl font-bold text-neutral-700">
-              三个核心单词训练完成
+              {t("vocabulary.completeTitle")}
             </h1>
           </div>
           <div className="grid w-full grid-cols-2 gap-3 lg:grid-cols-4">
@@ -210,10 +221,15 @@ export function VocabularyLesson({
               variant="hearts"
               value={hasActiveSubscription ? Infinity : hearts}
             />
-            <SummaryCard label="正确率" value={`${accuracy}%`} />
             <SummaryCard
-              label="词汇状态"
-              value={`${masteredCount} 掌握 · ${words.length - masteredCount} 学习中`}
+              label={t("vocabulary.accuracy")}
+              value={`${accuracy}%`}
+            />
+            <SummaryCard
+              label={t("vocabulary.wordStatus")}
+              value={`${masteredCount} ${t("vocabulary.mastered")} · ${
+                words.length - masteredCount
+              } ${t("vocabulary.learning")}`}
             />
           </div>
         </div>
@@ -224,7 +240,7 @@ export function VocabularyLesson({
               variant="secondary"
               onClick={() => router.push("/learn")}
             >
-              继续
+              {t("common.continue")}
             </Button>
           </div>
         </footer>
@@ -234,8 +250,11 @@ export function VocabularyLesson({
 
   if (!currentWord) {
     return (
-      <div className="flex h-full items-center justify-center font-bold text-rose-500">
-        课程单词数据不完整。
+      <div
+        id="main-content"
+        className="flex h-full items-center justify-center font-bold text-rose-500"
+      >
+        {t("vocabulary.dataMissing")}
       </div>
     );
   }
@@ -243,18 +262,18 @@ export function VocabularyLesson({
   const correcting = feedbackState === "correcting";
   const canSubmit = answer.trim().length > 0;
   const title = correcting
-    ? "请重新输入正确单词"
+    ? t("vocabulary.correctionTitle")
     : exercise.type === "MEANING_CHOICE"
-      ? "请选择正确中文"
+      ? t("vocabulary.meaningTitle")
       : exercise.type === "SPELLING"
-        ? "请输入英文"
-        : "完成句子";
+        ? t("vocabulary.spellingTitle")
+        : t("vocabulary.contextTitle");
   const buttonLabel =
     feedbackState === "answering"
-      ? "检查"
+      ? t("common.check")
       : feedbackState === "correcting"
-        ? "确认拼写"
-        : "继续";
+        ? t("vocabulary.confirmSpelling")
+        : t("common.continue");
 
   return (
     <>
@@ -268,10 +287,13 @@ export function VocabularyLesson({
       />
       {hearts === 0 && !hasActiveSubscription && (
         <p className="mt-3 text-center text-sm font-semibold text-rose-500">
-          Hearts 已用完，仍可继续完成本次训练。
+          {t("vocabulary.heartsEmpty")}
         </p>
       )}
-      <main className="flex flex-1 items-center justify-center">
+      <main
+        id="main-content"
+        className="flex flex-1 items-center justify-center"
+      >
         <div className="w-full max-w-[640px] space-y-8 px-6 py-8 lg:px-0">
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-sky-500">
@@ -357,7 +379,7 @@ export function VocabularyLesson({
             }
             onClick={handleAction}
           >
-            {buttonLabel}
+            {pending ? t("common.working") : buttonLabel}
           </Button>
         </div>
       </footer>

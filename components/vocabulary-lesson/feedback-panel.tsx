@@ -2,6 +2,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { VocabularyFeedbackState } from "@/lib/vocabulary/lesson-flow";
+import { useI18n } from "@/lib/i18n/provider";
 
 type FeedbackPanelProps = {
   state: VocabularyFeedbackState;
@@ -18,6 +19,8 @@ export function FeedbackPanel({
   xpAwarded,
   hearts,
 }: FeedbackPanelProps) {
+  const { t } = useI18n();
+
   if (state === "answering") return null;
 
   const positive = state === "correct" || state === "corrected";
@@ -37,15 +40,19 @@ export function FeedbackPanel({
         )}
         <div>
           <p className="text-lg font-black">
-            {state === "correct" && "Perfect!"}
-            {state === "corrected" && "纠正完成，可以继续。"}
-            {state === "wrong" && "回答错误"}
-            {state === "correcting" && "拼写错误，请完成纠正"}
+            {state === "correct" && t("vocabulary.perfect")}
+            {state === "corrected" && t("vocabulary.corrected")}
+            {state === "wrong" && t("vocabulary.wrong")}
+            {state === "correcting" && t("vocabulary.spellingWrong")}
           </p>
           {!positive && (
             <div className="mt-1 text-sm">
-              <p>你的答案：{userAnswer || "（空）"}</p>
-              <p>正确答案：{correctAnswer}</p>
+              <p>
+                {t("vocabulary.yourAnswer")}：{userAnswer || "—"}
+              </p>
+              <p>
+                {t("vocabulary.correctAnswer")}：{correctAnswer}
+              </p>
             </div>
           )}
         </div>

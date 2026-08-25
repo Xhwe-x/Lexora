@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { cookies, headers } from "next/headers";
 
 import {
@@ -18,7 +20,7 @@ function parseAcceptedLanguages(value: string | null) {
     .filter((entry): entry is string => Boolean(entry));
 }
 
-export async function getRequestLocale(): Promise<Locale> {
+export const getRequestLocale = cache(async (): Promise<Locale> => {
   const cookieLocale = (await cookies()).get(LOCALE_COOKIE)?.value;
 
   if (cookieLocale) return resolveLocale(cookieLocale);
@@ -27,4 +29,4 @@ export async function getRequestLocale(): Promise<Locale> {
     (await headers()).get("accept-language")
   );
   return detectBrowserLocale(acceptedLanguages);
-}
+});

@@ -1,5 +1,14 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/i18n/provider", () => ({
+  useI18n: () => ({
+    t: (key: string) =>
+      ({
+        "vocabulary.chooseMeaning": "Choose the meaning",
+      } as Record<string, string>)[key] ?? key,
+  }),
+}));
 
 import { MeaningChoice } from "./meaning-choice";
 
@@ -19,5 +28,6 @@ describe("MeaningChoice", () => {
 
     expect(html).toContain("available");
     expect(html).toContain("可获得的；有空的");
+    expect(html).toContain("Choose the meaning");
   });
 });

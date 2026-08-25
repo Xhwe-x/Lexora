@@ -14,9 +14,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { usePracticeModal } from "@/store/use-practice-modal";
+import { useI18n } from "@/lib/i18n/provider";
 
 export const PracticeModal = () => {
   const [isClient, setIsClient] = useState(false);
+  const { t } = useI18n();
   const { isOpen, close } = usePracticeModal();
 
   useEffect(() => setIsClient(true), []);
@@ -28,16 +30,21 @@ export const PracticeModal = () => {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="mb-5 flex w-full items-center justify-center">
-            <Image src="/heart.svg" alt="Heart" height={100} width={100} />
+            <Image
+              src="/heart.svg"
+              alt=""
+              aria-hidden="true"
+              height={100}
+              width={100}
+            />
           </div>
 
           <DialogTitle className="text-center text-2xl font-bold">
-            Practice lesson
+            {t("modal.practiceTitle")}
           </DialogTitle>
 
           <DialogDescription className="text-center text-base">
-            Use practice lessons to regain hearts and points. You cannot loose
-            hearts or points in practice lessons.
+            {t("modal.practiceDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -49,7 +56,7 @@ export const PracticeModal = () => {
               size="lg"
               onClick={close}
             >
-              I understand
+              {t("modal.understand")}
             </Button>
           </div>
         </DialogFooter>
