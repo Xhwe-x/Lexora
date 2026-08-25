@@ -7,7 +7,6 @@ import {
   SignInButton,
   Show,
   UserButton,
-  useAuth,
 } from "@clerk/nextjs";
 import { Loader } from "lucide-react";
 import Image from "next/image";
@@ -18,13 +17,16 @@ import { Button } from "@/components/ui/button";
 import { links } from "@/config";
 import { cn } from "@/lib/utils";
 
-export const Header = () => {
-  const { isSignedIn } = useAuth();
+type HeaderProps = {
+  authEnabled: boolean;
+};
+
+export const Header = ({ authEnabled }: HeaderProps) => {
   const [hideBanner, setHideBanner] = useState(true);
 
   return (
     <>
-      <Banner hide={hideBanner} setHide={setHideBanner} />
+      {authEnabled && <Banner hide={hideBanner} setHide={setHideBanner} />}
 
       <header
         className={cn(
@@ -46,39 +48,52 @@ export const Header = () => {
           </Link>
 
           <div className="flex gap-x-3">
-            <ClerkLoading>
-              <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
-            </ClerkLoading>
-            <ClerkLoaded>
-              <Show when="signed-in">
-                <UserButton />
-              </Show>
-
-              <Show when="signed-out">
-                <SignInButton mode="modal">
-                  <Button size="lg" variant="ghost">
-                    Login
-                  </Button>
-                </SignInButton>
-              </Show>
-
-              <Link
-                href={links.sourceCode}
-                target="_blank"
-                rel="noreferrer noopener"
-                className={isSignedIn ? "pt-1.5" : "pt-3"}
-              >
-                <Image
-                  src="/github.svg"
-                  alt="Source Code"
-                  height={20}
-                  width={20}
-                />
-              </Link>
-            </ClerkLoaded>
+            {authEnabled ? (
+              <ClerkHeaderActions />
+            ) : (
+              <span className="self-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                Preview
+              </span>
+            )}
+            <Link
+              href={links.sourceCode}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="pt-3"
+            >
+              <Image
+                src="/github.svg"
+                alt="Source Code"
+                height={20}
+                width={20}
+              />
+            </Link>
           </div>
         </div>
       </header>
     </>
   );
 };
+
+function ClerkHeaderActions() {
+  return (
+    <>
+      <ClerkLoading>
+        <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
+      </ClerkLoading>
+      <ClerkLoaded>
+        <Show when="signed-in">
+          <UserButton />
+        </Show>
+
+        <Show when="signed-out">
+          <SignInButton mode="modal">
+            <Button size="lg" variant="ghost">
+              Login
+            </Button>
+          </SignInButton>
+        </Show>
+      </ClerkLoaded>
+    </>
+  );
+}

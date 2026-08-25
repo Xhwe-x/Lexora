@@ -10,7 +10,7 @@ export const Footer = () => {
           <Image
             src="/hr.svg"
             alt="Croatian"
-            height={32}
+            height={30}
             width={40}
             className="mr-4 rounded-md"
           />
@@ -21,7 +21,7 @@ export const Footer = () => {
           <Image
             src="/es.svg"
             alt="Spanish"
-            height={32}
+            height={30}
             width={40}
             className="mr-4 rounded-md"
           />
@@ -32,7 +32,7 @@ export const Footer = () => {
           <Image
             src="/fr.svg"
             alt="French"
-            height={32}
+            height={30}
             width={40}
             className="mr-4 rounded-md"
           />
@@ -43,7 +43,7 @@ export const Footer = () => {
           <Image
             src="/it.svg"
             alt="Italian"
-            height={32}
+            height={30}
             width={40}
             className="mr-4 rounded-md"
           />
@@ -54,7 +54,7 @@ export const Footer = () => {
           <Image
             src="/jp.svg"
             alt="Japanese"
-            height={32}
+            height={30}
             width={40}
             className="mr-4 rounded-md"
           />

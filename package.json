@@ -3,15 +3,15 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --hostname 127.0.0.1 --port 3100",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "test": "vitest",
     "test:run": "vitest run",
-    "format": "prettier --check --ignore-path .gitignore .",
-    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "format": "prettier --check --ignore-path .gitignore --ignore-path .prettierignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore --ignore-path .prettierignore .",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "db:prod": "tsx ./scripts/prod.ts",
@@ -107,12 +107,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sanidhyy/duolingo-clone.git"
+    "url": "https://github.com/Xhwe-x/Lexora.git"
   },
-  "homepage": "https://github.com/sanidhyy/duolingo-clone#readme",
+  "homepage": "https://github.com/Xhwe-x/Lexora#readme",
   "bugs": {
-    "url": "https://github.com/sanidhyy/duolingo-clone/issues",
-    "email": "sanidhyyy@gmail.com"
+    "url": "https://github.com/Xhwe-x/Lexora/issues"
   },
   "funding": [
     {

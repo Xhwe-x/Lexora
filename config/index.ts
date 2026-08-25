@@ -45,6 +45,6 @@ export const siteConfig: Metadata = {
 } as const;
 
 export const links = {
-  sourceCode: "https://github.com/sanidhyy/duolingo-clone",
+  sourceCode: "https://github.com/Xhwe-x/Lexora",
   email: "sanidhyyy@gmail.com",
 } as const;

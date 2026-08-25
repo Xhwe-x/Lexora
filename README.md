@@ -1,6 +1,10 @@
 <a name="readme-top"></a>
 
-# Lingo - Interactive platform for language learning.
+# Lexora - Interactive vocabulary and language learning.
+
+Lexora is being developed from the original Lingo Duolingo clone. The current
+feature branch adds a three-word CET-4 vocabulary-learning core while keeping
+the legacy lesson flow compatible.
 
 ![Lingo - Interactive platform for language learning.](/.github/images/img_main.png "Lingo - Interactive platform for language learning.")
 
@@ -44,6 +48,7 @@
 Here is the folder structure of this app.
 
 <!--- FOLDER_STRUCTURE_START --->
+
 ```bash
 duolingo-clone/
   |- actions/
@@ -112,6 +117,7 @@ duolingo-clone/
   |- tsconfig.json
   |- vercel.ts
 ```
+
 <!--- FOLDER_STRUCTURE_END --->
 
 <br />
@@ -141,7 +147,7 @@ STRIPE_API_SECRET_KEY="replace_with_stripe_secret_key"
 STRIPE_WEBHOOK_SECRET="replace_with_stripe_webhook_secret"
 
 # public app url
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3100
 
 # clerk admin user id(s) separated by comma (,)
 CLERK_ADMIN_IDS="user_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -175,7 +181,7 @@ CLERK_ADMIN_IDS="user_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 8. Specify Public App URL
    1. **Procedure**:
-      - Replace `http://localhost:3000` with the URL of your deployed application.
+      - Replace `http://127.0.0.1:3100` with the URL of your deployed application.
 
 9. Identify Clerk Admin User IDs
    1. **Source**: Clerk Dashboard or Settings Page
@@ -204,7 +210,18 @@ This command uses `tsx` to execute the Typescript file (`scripts/prod.ts`) and w
 
 Once the script completes, check your database to ensure that the challenges data has been successfully seeded.
 
-14. Now app is fully configured 👍 and you can start using this app using either one of `pnpm dev`.
+14. Start the app with `pnpm dev`, then open `http://127.0.0.1:3100`.
+
+### Public preview without credentials
+
+Running `pnpm dev` without Clerk or database credentials opens the public
+homepage in preview mode. Protected pages redirect to `/`, and API routes
+return `503` until authentication is configured. This preview does not create
+fake users and does not bypass protected lesson routes.
+
+To use sign-in, courses, lessons, database Seed scripts, and progress
+persistence, create a local `.env.local` using `.env.example` as the template.
+Never commit `.env.local` or real service keys.
 
 **NOTE:** Please make sure to keep your API keys and configuration values secure and do not expose them publicly.
 
@@ -247,6 +264,7 @@ Useful resources and dependencies that are used in Lingo.
 - Flagpack: https://flagpack.xyz/
 
 <!--- DEPENDENCIES_START --->
+
 - [@clerk/nextjs](https://www.npmjs.com/package/@clerk/nextjs): ^7.7.6
 - [@neondatabase/serverless](https://www.npmjs.com/package/@neondatabase/serverless): ^1.1.0
 - [@radix-ui/react-avatar](https://www.npmjs.com/package/@radix-ui/react-avatar): ^1.2.6

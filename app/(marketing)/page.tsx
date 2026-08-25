@@ -10,12 +10,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { isClerkConfigured } from "@/lib/preview-mode";
 
 export default function MarketingPage() {
+  const authEnabled = isClerkConfigured({
+    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.CLERK_SECRET_KEY,
+  });
+
   return (
     <div className="mx-auto flex w-full max-w-[988px] flex-1 flex-col items-center justify-center gap-2 p-4 lg:flex-row">
       <div className="relative mb-8 h-[240px] w-[240px] lg:mb-0 lg:h-[424px] lg:w-[424px]">
-        <Image src="/hero.svg" alt="Hero" fill />
+        <Image src="/hero.svg" alt="Hero" fill loading="eager" />
       </div>
 
       <div className="flex flex-col items-center gap-y-8">
@@ -24,33 +30,53 @@ export default function MarketingPage() {
         </h1>
 
         <div className="flex w-full max-w-[330px] flex-col items-center gap-y-3">
-          <ClerkLoading>
-            <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
-          </ClerkLoading>
+          {authEnabled ? (
+            <>
+              <ClerkLoading>
+                <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
+              </ClerkLoading>
 
-          <ClerkLoaded>
-            <Show when="signed-in">
-              <Button size="lg" variant="secondary" className="w-full" asChild>
-                <Link href="/learn" prefetch>
-                  Continue Learning
-                </Link>
-              </Button>
-            </Show>
+              <ClerkLoaded>
+                <Show when="signed-in">
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    className="w-full"
+                    asChild
+                  >
+                    <Link href="/learn" prefetch>
+                      Continue Learning
+                    </Link>
+                  </Button>
+                </Show>
 
-            <Show when="signed-out">
-              <SignUpButton mode="modal">
-                <Button size="lg" variant="secondary" className="w-full">
-                  Get Started
-                </Button>
-              </SignUpButton>
+                <Show when="signed-out">
+                  <SignUpButton mode="modal">
+                    <Button size="lg" variant="secondary" className="w-full">
+                      Get Started
+                    </Button>
+                  </SignUpButton>
 
-              <SignInButton mode="modal">
-                <Button size="lg" variant="primaryOutline" className="w-full">
-                  I already have an account
-                </Button>
-              </SignInButton>
-            </Show>
-          </ClerkLoaded>
+                  <SignInButton mode="modal">
+                    <Button
+                      size="lg"
+                      variant="primaryOutline"
+                      className="w-full"
+                    >
+                      I already have an account
+                    </Button>
+                  </SignInButton>
+                </Show>
+              </ClerkLoaded>
+            </>
+          ) : (
+            <div className="w-full rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-center">
+              <p className="font-bold text-amber-700">Public Preview Mode</p>
+              <p className="mt-1 text-sm text-amber-700/80">
+                Configure Clerk in .env.local to enable sign-in and lessons.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

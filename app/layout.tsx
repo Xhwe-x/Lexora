@@ -7,6 +7,7 @@ import { HeartsModal } from "@/components/modals/hearts-modal";
 import { PracticeModal } from "@/components/modals/practice-modal";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config";
+import { isClerkConfigured } from "@/lib/preview-mode";
 
 import "./globals.css";
 
@@ -23,6 +24,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clerkConfigured = isClerkConfigured({
+    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.CLERK_SECRET_KEY,
+  });
+  const document = (
+    <html lang="en">
+      <body className={font.className}>
+        <Toaster theme="light" richColors closeButton />
+        <ExitModal />
+        <HeartsModal />
+        <PracticeModal />
+        {children}
+      </body>
+    </html>
+  );
+
+  if (!clerkConfigured) return document;
+
   return (
     <ClerkProvider
       appearance={{
@@ -36,15 +55,7 @@ export default function RootLayout({
       telemetry={false}
       afterSignOutUrl="/"
     >
-      <html lang="en">
-        <body className={font.className}>
-          <Toaster theme="light" richColors closeButton />
-          <ExitModal />
-          <HeartsModal />
-          <PracticeModal />
-          {children}
-        </body>
-      </html>
+      {document}
     </ClerkProvider>
   );
 }

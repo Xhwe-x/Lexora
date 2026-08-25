@@ -1,7 +1,5 @@
 export type VocabularyExerciseType =
-  | "MEANING_CHOICE"
-  | "SPELLING"
-  | "CONTEXT_INPUT";
+  "MEANING_CHOICE" | "SPELLING" | "CONTEXT_INPUT";
 
 export type VocabularyExercise = {
   id: string;
