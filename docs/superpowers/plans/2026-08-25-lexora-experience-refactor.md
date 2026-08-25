@@ -33,8 +33,7 @@ Clerk, Drizzle ORM, Neon HTTP, Vitest.
 
 ## Execution status
 
-- Tasks 1–8: complete.
-- Task 9 local review and release verification: pending.
+- Tasks 1–9: complete.
 - `/learn` baseline: 2851 ms; consolidated-query runs: 1386, 1313, and
   1121 ms (1273 ms average, about 55% faster).
 - Vocabulary Lesson baseline: 1370 ms; warm post-refactor runs: 913 and
@@ -45,6 +44,10 @@ Clerk, Drizzle ORM, Neon HTTP, Vitest.
   390 × 844 layout passed authenticated Chrome QA.
 - Expected external-only console messages: Clerk development-key warning and a
   hydration attribute injected by the user's `cz-shortcut-listen` extension.
+- Final verification: 14 test files and 83 tests pass; format, lint, TypeScript,
+  and the production build pass with the real `.env.local` configuration.
+- Local `code-review-and-quality` review found 0 Critical and 4 Required issues;
+  all Required issues were fixed and reverified.
 
 ---
 
