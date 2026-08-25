@@ -3,14 +3,21 @@ import { cache } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 
+import {
+  getVocabularyLessonPercentage as calculateVocabularyLessonPercentage,
+  isVocabularyLessonCompleted,
+} from "@/lib/vocabulary/lesson-progress";
+
 import db from "./drizzle";
 import {
   challengeProgress,
   courses,
   lessons,
+  lessonWords,
   units,
   userProgress,
   userSubscription,
+  userWordProgress,
 } from "./schema";
 
 const DAY_IN_MS = 86_400_000;
@@ -49,6 +56,18 @@ export const getUnits = cache(async () => {
       lessons: {
         orderBy: (lessons, { asc }) => [asc(lessons.order)],
         with: {
+          lessonWords: {
+            orderBy: (lessonWords, { asc }) => [asc(lessonWords.order)],
+            with: {
+              word: {
+                with: {
+                  userWordProgress: {
+                    where: eq(userWordProgress.userId, userId),
+                  },
+                },
+              },
+            },
+          },
           challenges: {
             orderBy: (challenges, { asc }) => [asc(challenges.order)],
             with: {
@@ -64,6 +83,13 @@ export const getUnits = cache(async () => {
 
   const normalizedData = data.map((unit) => {
     const lessonsWithCompletedStatus = unit.lessons.map((lesson) => {
+      if (lesson.lessonWords.length > 0) {
+        return {
+          ...lesson,
+          completed: isVocabularyLessonCompleted(lesson.lessonWords),
+        };
+      }
+
       if (lesson.challenges.length === 0)
         return { ...lesson, completed: false };
 
@@ -116,6 +142,18 @@ export const getCourseProgress = cache(async () => {
         orderBy: (lessons, { asc }) => [asc(lessons.order)],
         with: {
           unit: true,
+          lessonWords: {
+            orderBy: (lessonWords, { asc }) => [asc(lessonWords.order)],
+            with: {
+              word: {
+                with: {
+                  userWordProgress: {
+                    where: eq(userWordProgress.userId, userId),
+                  },
+                },
+              },
+            },
+          },
           challenges: {
             with: {
               challengeProgress: {
@@ -131,6 +169,10 @@ export const getCourseProgress = cache(async () => {
   const firstUncompletedLesson = unitsInActiveCourse
     .flatMap((unit) => unit.lessons)
     .find((lesson) => {
+      if (lesson.lessonWords.length > 0) {
+        return !isVocabularyLessonCompleted(lesson.lessonWords);
+      }
+
       return lesson.challenges.some((challenge) => {
         return (
           !challenge.challengeProgress ||
@@ -144,6 +186,47 @@ export const getCourseProgress = cache(async () => {
     activeLesson: firstUncompletedLesson,
     activeLessonId: firstUncompletedLesson?.id,
   };
+});
+
+export const getLessonMode = cache(async (lessonId: number) => {
+  const vocabularyWord = await db.query.lessonWords.findFirst({
+    where: eq(lessonWords.lessonId, lessonId),
+    columns: { id: true },
+  });
+
+  return vocabularyWord ? ("VOCABULARY" as const) : ("LEGACY" as const);
+});
+
+export const getVocabularyLesson = cache(async (lessonId: number) => {
+  const { userId } = await auth();
+
+  if (!userId) return null;
+
+  return db.query.lessons.findFirst({
+    where: eq(lessons.id, lessonId),
+    with: {
+      unit: {
+        with: {
+          course: true,
+        },
+      },
+      lessonWords: {
+        orderBy: (lessonWords, { asc }) => [asc(lessonWords.order)],
+        with: {
+          word: {
+            with: {
+              examples: {
+                orderBy: (examples, { asc }) => [asc(examples.id)],
+              },
+              userWordProgress: {
+                where: eq(userWordProgress.userId, userId),
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 });
 
 export const getLesson = cache(async (id?: number) => {
@@ -189,6 +272,13 @@ export const getLessonPercentage = cache(async () => {
   const courseProgress = await getCourseProgress();
 
   if (!courseProgress?.activeLessonId) return 0;
+
+  const mode = await getLessonMode(courseProgress.activeLessonId);
+
+  if (mode === "VOCABULARY") {
+    const lesson = await getVocabularyLesson(courseProgress.activeLessonId);
+    return calculateVocabularyLessonPercentage(lesson?.lessonWords ?? []);
+  }
 
   const lesson = await getLesson(courseProgress?.activeLessonId);
 
