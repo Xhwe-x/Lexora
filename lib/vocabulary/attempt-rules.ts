@@ -86,3 +86,7 @@ export function validateVocabularyAttemptInput(input: VocabularyAttemptInput) {
     throw new Error("Invalid response time.");
   }
 }
+
+export function getVocabularyAttemptRevalidationPaths() {
+  return ["/learn", "/quests", "/leaderboard"] as const;
+}

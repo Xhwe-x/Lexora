@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { evaluateVocabularyAnswer } from "@/lib/vocabulary/answer-evaluator";
 import {
+  getVocabularyAttemptRevalidationPaths,
   getVocabularyProgressIncrements,
   getVocabularyXp,
   validateVocabularyAttemptInput,
@@ -164,11 +165,9 @@ export async function submitVocabularyAttempt(input: VocabularyAttemptInput) {
     throw new Error("Failed to update vocabulary progress.");
   }
 
-  revalidatePath("/learn");
-  revalidatePath("/quests");
-  revalidatePath("/leaderboard");
-  revalidatePath("/lesson");
-  revalidatePath(`/lesson/${input.lessonId}`);
+  for (const path of getVocabularyAttemptRevalidationPaths()) {
+    revalidatePath(path);
+  }
 
   return {
     correct: evaluation.correct,

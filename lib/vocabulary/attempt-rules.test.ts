@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getVocabularyMasteryLevel,
+  getVocabularyAttemptRevalidationPaths,
   getVocabularyProgressIncrements,
   getVocabularyXp,
   validateVocabularyAttemptInput,
@@ -130,5 +131,14 @@ describe("validateVocabularyAttemptInput", () => {
     [{ ...validInput, responseMs: -1 }, "Invalid response time."],
   ])("rejects malformed attempt input", (input, message) => {
     expect(() => validateVocabularyAttemptInput(input)).toThrow(message);
+  });
+});
+
+describe("getVocabularyAttemptRevalidationPaths", () => {
+  it("refreshes map surfaces without invalidating the active lesson", () => {
+    const paths = getVocabularyAttemptRevalidationPaths();
+
+    expect(paths).toEqual(["/learn", "/quests", "/leaderboard"]);
+    expect(paths).not.toContain("/lesson");
   });
 });
