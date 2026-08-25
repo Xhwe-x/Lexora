@@ -9,7 +9,7 @@ export const Promo = async () => {
   const locale = await getRequestLocale();
 
   return (
-    <div className="space-y-4 rounded-xl border-2 p-4">
+    <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
       <div className="space-y-2">
         <div className="flex items-center gap-x-2">
           <Image src="/unlimited.svg" alt="Pro" height={26} width={26} />

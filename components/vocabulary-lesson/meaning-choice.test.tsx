@@ -4,9 +4,11 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/i18n/provider", () => ({
   useI18n: () => ({
     t: (key: string) =>
-      ({
-        "vocabulary.chooseMeaning": "Choose the meaning",
-      } as Record<string, string>)[key] ?? key,
+      (
+        ({
+          "vocabulary.chooseMeaning": "Choose the meaning",
+        }) as Record<string, string>
+      )[key] ?? key,
   }),
 }));
 

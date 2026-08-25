@@ -4,7 +4,7 @@ import { Check, Crown, Star } from "lucide-react";
 import Link from "next/link";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/provider";
 
@@ -52,6 +52,13 @@ export const LessonButton = ({
     <Link
       href={href}
       prefetch
+      aria-label={
+        locked
+          ? t("learn.locked")
+          : isCompleted
+            ? t("learn.completed")
+            : t("learn.start")
+      }
       aria-disabled={locked}
       style={{ pointerEvents: locked ? "none" : "auto" }}
     >
@@ -82,12 +89,15 @@ export const LessonButton = ({
                 },
               }}
             >
-              <Button
-                size="rounded"
-                variant={locked ? "locked" : "secondary"}
-                className="h-[70px] w-[70px] border-b-8"
+              <div
+                className={buttonVariants({
+                  size: "rounded",
+                  variant: locked ? "locked" : "secondary",
+                  className: "h-[70px] w-[70px] border-b-8",
+                })}
               >
                 <Icon
+                  aria-hidden="true"
                   className={cn(
                     "h-10 w-10",
                     locked
@@ -96,16 +106,19 @@ export const LessonButton = ({
                     isCompleted && "fill-none stroke-[4]"
                   )}
                 />
-              </Button>
+              </div>
             </CircularProgressbarWithChildren>
           </div>
         ) : (
-          <Button
-            size="rounded"
-            variant={locked ? "locked" : "secondary"}
-            className="h-[70px] w-[70px] border-b-8"
+          <div
+            className={buttonVariants({
+              size: "rounded",
+              variant: locked ? "locked" : "secondary",
+              className: "h-[70px] w-[70px] border-b-8",
+            })}
           >
             <Icon
+              aria-hidden="true"
               className={cn(
                 "h-10 w-10",
                 locked
@@ -114,7 +127,7 @@ export const LessonButton = ({
                 isCompleted && "fill-none stroke-[4]"
               )}
             />
-          </Button>
+          </div>
         )}
       </div>
     </Link>

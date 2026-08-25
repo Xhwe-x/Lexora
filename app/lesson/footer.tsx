@@ -35,14 +35,20 @@ export const Footer = ({
       <div className="mx-auto flex h-full max-w-[1140px] items-center justify-between px-6 lg:px-10">
         {status === "correct" && (
           <div className="flex items-center text-base font-bold text-green-500 lg:text-2xl">
-            <CheckCircle className="mr-4 h-6 w-6 lg:h-10 lg:w-10" />
+            <CheckCircle
+              aria-hidden="true"
+              className="mr-4 h-6 w-6 lg:h-10 lg:w-10"
+            />
             {t("common.nicelyDone")}
           </div>
         )}
 
         {status === "wrong" && (
           <div className="flex items-center text-base font-bold text-rose-500 lg:text-2xl">
-            <XCircle className="mr-4 h-6 w-6 lg:h-10 lg:w-10" />
+            <XCircle
+              aria-hidden="true"
+              className="mr-4 h-6 w-6 lg:h-10 lg:w-10"
+            />
             {t("common.tryAgain")}
           </div>
         )}

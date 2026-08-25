@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
+import { useMedia, useWindowSize } from "react-use";
 
 import { ResultCard } from "@/app/lesson/result-card";
 import { Button } from "@/components/ui/button";
@@ -27,16 +27,19 @@ export function VocabularyCompletion({
   const { t } = useI18n();
   const router = useRouter();
   const { width, height } = useWindowSize();
+  const reduceMotion = useMedia("(prefers-reduced-motion: reduce)");
 
   return (
     <>
-      <Confetti
-        recycle={false}
-        numberOfPieces={500}
-        tweenDuration={10_000}
-        width={width}
-        height={height}
-      />
+      {!reduceMotion && (
+        <Confetti
+          recycle={false}
+          numberOfPieces={500}
+          tweenDuration={10_000}
+          width={width}
+          height={height}
+        />
+      )}
       <div
         id="main-content"
         className="mx-auto flex h-full w-full max-w-2xl flex-col items-center justify-center gap-y-6 px-6 text-center"

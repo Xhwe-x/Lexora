@@ -4,6 +4,7 @@ import {
   type TypingFeedbackCell,
 } from "@/lib/vocabulary/typing-feedback";
 import { useI18n } from "@/lib/i18n/provider";
+import { useMedia } from "react-use";
 
 type WordInputTrackProps = {
   label: string;
@@ -23,6 +24,7 @@ export function WordInputTrack({
   onSubmit,
 }: WordInputTrackProps) {
   const { t } = useI18n();
+  const isDesktop = useMedia("(min-width: 768px)");
   const cells = buildTypingFeedback({ value, targetLength });
 
   return (
@@ -39,9 +41,11 @@ export function WordInputTrack({
         </div>
         <input
           aria-label={label}
-          autoFocus
+          autoFocus={isDesktop}
           autoComplete="off"
           autoCapitalize="none"
+          inputMode="text"
+          name="vocabulary-answer"
           spellCheck={false}
           disabled={disabled}
           value={value}

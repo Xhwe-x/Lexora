@@ -46,7 +46,7 @@ export const ResultCard = ({ value, variant }: ResultCardProps) => {
           className="mr-1.5"
         />
         {value === Infinity ? (
-          <InfinityIcon className="h-6 w-6 stroke-[3]" />
+          <InfinityIcon aria-hidden="true" className="h-6 w-6 stroke-[3]" />
         ) : (
           value
         )}

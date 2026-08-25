@@ -34,9 +34,9 @@ export function FeedbackPanel({
         )}
       >
         {positive ? (
-          <CheckCircle className="mt-0.5 h-7 w-7 shrink-0" />
+          <CheckCircle aria-hidden="true" className="mt-0.5 h-7 w-7 shrink-0" />
         ) : (
-          <XCircle className="mt-0.5 h-7 w-7 shrink-0" />
+          <XCircle aria-hidden="true" className="mt-0.5 h-7 w-7 shrink-0" />
         )}
         <div>
           <p className="text-lg font-black">

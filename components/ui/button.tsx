@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 uppercase tracking-wide",
+  "inline-flex touch-manipulation items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold tracking-wide ring-offset-background transition-[background-color,border-color,color,transform,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 uppercase",
   {
     variants: {
       variant: {
@@ -18,12 +18,14 @@ const buttonVariants = cva(
           "bg-neutral-200 text-primary-foreground hover:bg-neutral-200/90 border-neutral-400 border-b-4 active:border-b-0",
 
         primary:
-          "bg-sky-400 text-primary-foreground hover:bg-sky-400/90 border-sky-500 border-b-4 active:border-b-0",
-        primaryOutline: "bg-white text-sky-500 hover:bg-slate-100",
+          "border-2 border-b-4 border-teal-700 bg-teal-600 text-primary-foreground shadow-sm hover:-translate-y-0.5 hover:bg-teal-700 hover:shadow-md active:translate-y-0 active:border-b-2",
+        primaryOutline:
+          "border border-teal-200 bg-white text-teal-700 hover:bg-teal-50",
 
         secondary:
-          "bg-green-500 text-primary-foreground hover:bg-green-500/90 border-green-600 border-b-4 active:border-b-0",
-        secondaryOutline: "bg-white text-green-500 hover:bg-slate-100",
+          "border-2 border-b-4 border-emerald-600 bg-emerald-500 text-primary-foreground shadow-sm hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:translate-y-0 active:border-b-2",
+        secondaryOutline:
+          "border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50",
 
         danger:
           "bg-rose-500 text-primary-foreground hover:bg-rose-500/90 border-rose-600 border-b-4 active:border-b-0",
@@ -39,7 +41,7 @@ const buttonVariants = cva(
         sidebar:
           "bg-transparent text-slate-500 border-2 border-transparent hover:bg-slate-100 transition-none",
         sidebarOutline:
-          "bg-sky-500/15 text-sky-500 border-sky-300 border-2 hover:bg-sky-500/20 transition-none",
+          "bg-teal-500/10 text-teal-700 border-teal-200 border-2 hover:bg-teal-500/15 transition-none",
       },
       size: {
         default: "h-11 px-4 py-2",

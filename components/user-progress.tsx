@@ -59,7 +59,7 @@ export const UserProgress = async ({
             className="mr-2"
           />
           {hasActiveSubscription ? (
-            <InfinityIcon className="stroke-3 h-4 w-4" />
+            <InfinityIcon aria-hidden="true" className="stroke-3 h-4 w-4" />
           ) : (
             hearts
           )}

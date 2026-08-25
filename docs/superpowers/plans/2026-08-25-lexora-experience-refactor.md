@@ -31,6 +31,21 @@ Clerk, Drizzle ORM, Neon HTTP, Vitest.
 - Each stable task is committed separately and pushed to
   `feat/vocabulary-core`.
 
+## Execution status
+
+- Tasks 1–8: complete.
+- Task 9 local review and release verification: pending.
+- `/learn` baseline: 2851 ms; consolidated-query runs: 1386, 1313, and
+  1121 ms (1273 ms average, about 55% faster).
+- Vocabulary Lesson baseline: 1370 ms; warm post-refactor runs: 913 and
+  1172 ms.
+- Vocabulary Server Action internal timing improved from roughly
+  2.6–5.0 seconds to 1.287 seconds in authenticated development testing.
+- Chinese/English switching, refresh persistence, desktop layout, and
+  390 × 844 layout passed authenticated Chrome QA.
+- Expected external-only console messages: Clerk development-key warning and a
+  hydration attribute injected by the user's `cz-shortcut-listen` extension.
+
 ---
 
 ### Task 1: Lexora brand and design tokens

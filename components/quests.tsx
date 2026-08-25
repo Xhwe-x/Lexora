@@ -13,17 +13,17 @@ export const Quests = async ({ points }: QuestsProps) => {
   const locale = await getRequestLocale();
 
   return (
-    <div className="space-y-4 rounded-xl border-2 p-4">
+    <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
       <div className="flex w-full items-center justify-between space-y-2">
         <h3 className="text-lg font-bold">
           {translate(locale, "quests.title")}
         </h3>
 
-        <Link href="/quests" prefetch>
-          <Button size="sm" variant="primaryOutline">
+        <Button size="sm" variant="primaryOutline" asChild>
+          <Link href="/quests" prefetch>
             {translate(locale, "quests.viewAll")}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <ul className="w-full space-y-4">

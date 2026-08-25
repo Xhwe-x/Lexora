@@ -14,22 +14,23 @@ export const UnitBanner = async ({ title, description }: UnitBannerProps) => {
   const locale = await getRequestLocale();
 
   return (
-    <div className="flex w-full items-center justify-between rounded-xl bg-green-500 p-5 text-white">
+    <div className="flex w-full items-center justify-between rounded-3xl border border-teal-500/20 bg-gradient-to-br from-teal-700 to-emerald-600 p-6 text-white shadow-[0_20px_50px_-30px_hsl(var(--lexora-shadow)/0.8)]">
       <div className="space-y-2.5">
         <h3 className="text-2xl font-bold">{title}</h3>
         <p className="text-lg">{description}</p>
       </div>
 
-      <Link href="/lesson" prefetch>
-        <Button
-          size="lg"
-          variant="secondary"
-          className="hidden border-2 border-b-4 active:border-b-2 xl:flex"
-        >
-          <NotebookText className="mr-2" />
+      <Button
+        size="lg"
+        variant="default"
+        className="hidden border-white/70 bg-white text-teal-800 hover:bg-teal-50 xl:flex"
+        asChild
+      >
+        <Link href="/lesson" prefetch>
+          <NotebookText aria-hidden="true" className="mr-2" />
           {translate(locale, "learn.continue")}
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     </div>
   );
 };
