@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
 
 export const siteConfig: Metadata = {
-  title: "Lingo",
+  title: "Lexora",
   description:
-    "Interactive platform for language learning with lessons, quizzes, and progress tracking.",
+    "Keyboard-first vocabulary learning with active recall, context practice, and progress tracking.",
   keywords: [
     "reactjs",
     "nextjs",
     "vercel",
     "react",
-    "duolingo-clone",
+    "lexora",
+    "vocabulary-learning",
+    "cet4",
+    "cet6",
     "learn-language",
     "shadcn",
     "shadcn-ui",
     "radix-ui",
     "cn",
     "clsx",
-    "lingo",
     "postgresql",
     "sonner",
     "drizzle",
@@ -39,8 +41,8 @@ export const siteConfig: Metadata = {
     "css",
   ] as Array<string>,
   authors: {
-    name: "Sanidhya Kumar Verma",
-    url: "https://github.com/sanidhyy",
+    name: "Xhwe-x",
+    url: "https://github.com/Xhwe-x",
   },
 } as const;
 

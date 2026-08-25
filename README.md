@@ -6,16 +6,11 @@ Lexora is being developed from the original Lingo Duolingo clone. The current
 feature branch adds a three-word CET-4 vocabulary-learning core while keeping
 the legacy lesson flow compatible.
 
-![Lingo - Interactive platform for language learning.](/.github/images/img_main.png "Lingo - Interactive platform for language learning.")
+![Lexora vocabulary learning interface](/.github/images/img_main.png "Lexora vocabulary learning interface")
 
-[![Ask Me Anything!](https://flat.badgen.net/static/Ask%20me/anything?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy "Ask Me Anything!")
-[![GitHub license](https://flat.badgen.net/github/license/sanidhyy/duolingo-clone?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/duolingo-clone/blob/main/LICENSE "GitHub license")
-[![Maintenance](https://flat.badgen.net/static/Maintained/yes?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/duolingo-clone/commits/main "Maintenance")
-[![GitHub branches](https://flat.badgen.net/github/branches/sanidhyy/duolingo-clone?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/duolingo-clone/branches "GitHub branches")
-[![Github commits](https://flat.badgen.net/github/commits/sanidhyy/duolingo-clone?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/duolingo-clone/commits "Github commits")
-[![GitHub issues](https://flat.badgen.net/github/issues/sanidhyy/duolingo-clone?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/duolingo-clone/issues "GitHub issues")
-[![GitHub pull requests](https://flat.badgen.net/github/prs/sanidhyy/duolingo-clone?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/duolingo-clone/pulls "GitHub pull requests")
-[![Vercel status](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://lingo-clone.vercel.app/ "Vercel status")
+[![GitHub license](https://flat.badgen.net/github/license/Xhwe-x/Lexora?icon=github&color=black&scale=1.01)](https://github.com/Xhwe-x/Lexora/blob/main/LICENSE "GitHub license")
+[![Maintenance](https://flat.badgen.net/static/Maintained/yes?icon=github&color=black&scale=1.01)](https://github.com/Xhwe-x/Lexora/commits/main "Maintenance")
+[![GitHub issues](https://flat.badgen.net/github/issues/Xhwe-x/Lexora?icon=github&scale=1.01)](https://github.com/Xhwe-x/Lexora/issues "GitHub issues")
 
 <!-- Table of Contents -->
 <details>
@@ -50,7 +45,7 @@ Here is the folder structure of this app.
 <!--- FOLDER_STRUCTURE_START --->
 
 ```bash
-duolingo-clone/
+Lexora/
   |- actions/
     |-- challenge-progress.ts
     |-- user-progress.ts
@@ -140,7 +135,7 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="replace_with_clerk_publishable_key"
 CLERK_SECRET_KEY="replace_with_clerk_secret_key"
 
 # neon db uri
-DATABASE_URL="postgresql://<user>:<password>@<host>:<post>/lingo?sslmode=require"
+DATABASE_URL="postgresql://<user>:<password>@<host>:<post>/lexora?sslmode=verify-full"
 
 # stripe api key and webhook
 STRIPE_API_SECRET_KEY="replace_with_stripe_secret_key"
@@ -229,9 +224,7 @@ Never commit `.env.local` or real service keys.
 
 If you run into issues during installation or setup:
 
-- **GitHub Discussions** — [Open a Q&A discussion](https://github.com/sanidhyy/duolingo-clone/discussions/new?category=q-a) for setup and troubleshooting help.
-- **Email** — [sanidhyyy@gmail.com](mailto:sanidhyyy@gmail.com)
-- **Discord** — `@sanidhyy`
+- **GitHub Issues** — [Open an issue](https://github.com/Xhwe-x/Lexora/issues/new) for setup and troubleshooting help.
 
 ## :camera: Screenshots
 
@@ -247,7 +240,7 @@ If you run into issues during installation or setup:
 
 ## :wrench: Stats
 
-[![Stats for Lingo](/.github/images/stats.svg "Stats for Lingo")](https://pagespeed.web.dev/analysis?url=https://lingo-clone.vercel.app/ "Stats for Lingo")
+[![Lexora repository stats](/.github/images/stats.svg "Lexora repository stats")](https://github.com/Xhwe-x/Lexora "Lexora repository")
 
 ## :raised_hands: Contribute
 
@@ -255,7 +248,9 @@ You might encounter some bugs while using this app. You are more than welcome to
 
 ## :gem: Acknowledgements
 
-Useful resources and dependencies that are used in Lingo.
+Useful resources and dependencies used in Lexora. Lexora began from Sanidhya
+Kumar Verma&apos;s MIT-licensed Lingo/Duolingo clone and retains its attribution in
+the repository history and license.
 
 - Special Thanks to Code with Antonio: https://codewithantonio.com/
 - Kenney Assets: https://kenney.nl/
@@ -316,7 +311,7 @@ Useful resources and dependencies that are used in Lingo.
 ## :rocket: Follow Me
 
 [![Follow Me](https://img.shields.io/github/followers/sanidhyy?style=social&label=Follow&maxAge=2592000)](https://github.com/sanidhyy "Follow Me")
-[![Tweet about this project](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fx.com%2F_sanidhyy)](https://x.com/intent/tweet?text=Check+out+this+amazing+app:&url=https%3A%2F%2Fgithub.com%2Fsanidhyy%2Fduolingo-clone "Tweet about this project")
+[![Share Lexora](https://img.shields.io/badge/share-Lexora-0f766e)](https://x.com/intent/tweet?text=Check%20out%20Lexora&url=https%3A%2F%2Fgithub.com%2FXhwe-x%2FLexora "Share Lexora")
 
 ## :books: Learn More
 
@@ -339,11 +334,11 @@ You can also give this repository a star to show more people and they can use th
 
 ## :star2: Star History
 
-<a href="https://star-history.com/#sanidhyy/duolingo-clone&Timeline">
+<a href="https://star-history.com/#Xhwe-x/Lexora&Timeline">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=sanidhyy/duolingo-clone&type=Timeline&theme=dark" />
-  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=sanidhyy/duolingo-clone&type=Timeline" />
-  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=sanidhyy/duolingo-clone&type=Timeline" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Xhwe-x/Lexora&type=Timeline&theme=dark" />
+  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Xhwe-x/Lexora&type=Timeline" />
+  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Xhwe-x/Lexora&type=Timeline" />
 </picture>
 </a>
 

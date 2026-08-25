@@ -1,5 +1,5 @@
 {
-  "name": "duolingo-clone",
+  "name": "lexora",
   "version": "1.0.1",
   "private": true,
   "scripts": {
@@ -65,24 +65,25 @@
   },
   "packageManager": "pnpm@11.11.0",
   "author": {
-    "name": "Sanidhya Kumar Verma",
-    "email": "sanidhyyy@gmail.com",
-    "url": "https://github.com/sanidhyy"
+    "name": "Xhwe-x",
+    "url": "https://github.com/Xhwe-x"
   },
-  "description": "Interactive platform for language learning with lessons, quizzes, and progress tracking.",
+  "description": "Keyboard-first vocabulary learning with active recall, context practice, and progress tracking.",
   "keywords": [
     "reactjs",
     "nextjs",
     "vercel",
     "react",
-    "duolingo-clone",
+    "lexora",
+    "vocabulary-learning",
+    "cet4",
+    "cet6",
     "learn-language",
     "shadcn",
     "shadcn-ui",
     "radix-ui",
     "cn",
     "clsx",
-    "lingo",
     "postgresql",
     "sonner",
     "drizzle",

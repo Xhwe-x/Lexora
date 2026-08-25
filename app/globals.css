@@ -39,6 +39,14 @@ body,
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --lexora-ink: 222 47% 11%;
+    --lexora-brand: 166 76% 37%;
+    --lexora-brand-strong: 173 80% 30%;
+    --lexora-focus: 199 89% 48%;
+    --lexora-surface: 160 33% 98%;
+    --lexora-surface-strong: 166 31% 94%;
+    --lexora-shadow: 174 45% 24%;
   }
 
   .dark {
@@ -77,6 +85,41 @@ body,
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    color: hsl(var(--lexora-ink));
+    background:
+      radial-gradient(
+        circle at 12% 5%,
+        hsl(var(--lexora-surface-strong) / 0.75),
+        transparent 28rem
+      ),
+      hsl(var(--lexora-surface));
+  }
+
+  ::selection {
+    color: hsl(var(--lexora-ink));
+    background: hsl(var(--lexora-brand) / 0.22);
+  }
+
+  button,
+  a,
+  input {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: hsl(var(--lexora-brand) / 0.14);
+  }
+
+  :focus-visible {
+    outline: 3px solid hsl(var(--lexora-focus) / 0.7);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

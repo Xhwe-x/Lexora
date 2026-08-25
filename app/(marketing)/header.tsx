@@ -43,7 +43,7 @@ export const Header = ({ authEnabled }: HeaderProps) => {
             <Image src="/mascot.svg" alt="Mascot" height={40} width={40} />
 
             <h1 className="text-2xl font-extrabold tracking-wide text-green-600">
-              Lingo
+              Lexora
             </h1>
           </Link>
 
