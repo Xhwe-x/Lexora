@@ -7,6 +7,8 @@ import { HeartsModal } from "@/components/modals/hearts-modal";
 import { PracticeModal } from "@/components/modals/practice-modal";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config";
+import { LocaleProvider } from "@/lib/i18n/provider";
+import { getRequestLocale } from "@/lib/i18n/server";
 import { isClerkConfigured } from "@/lib/preview-mode";
 
 import "./globals.css";
@@ -19,23 +21,26 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = siteConfig;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialLocale = await getRequestLocale();
   const clerkConfigured = isClerkConfigured({
     publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     secretKey: process.env.CLERK_SECRET_KEY,
   });
   const document = (
-    <html lang="en">
+    <html lang={initialLocale}>
       <body className={font.className}>
-        <Toaster theme="light" richColors closeButton />
-        <ExitModal />
-        <HeartsModal />
-        <PracticeModal />
-        {children}
+        <LocaleProvider initialLocale={initialLocale}>
+          <Toaster theme="light" richColors closeButton />
+          <ExitModal />
+          <HeartsModal />
+          <PracticeModal />
+          {children}
+        </LocaleProvider>
       </body>
     </html>
   );
