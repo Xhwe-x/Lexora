@@ -21,6 +21,10 @@ Implementation is active on `feat/vocabulary-core`.
 | Public preview mode                  | Complete      | Browser and HTTP verification                     |
 | Authenticated end-to-end acceptance  | In progress   | Clerk loaded; user sign-in and Lesson flow remain |
 
+The stale upstream account-limit banner was replaced with a Lexora Vocabulary
+Core status banner so new Clerk users are not incorrectly told registration is
+disabled.
+
 ## Current scope
 
 Implement one runnable vocabulary Lesson for:

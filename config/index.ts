@@ -46,5 +46,4 @@ export const siteConfig: Metadata = {
 
 export const links = {
   sourceCode: "https://github.com/Xhwe-x/Lexora",
-  email: "sanidhyyy@gmail.com",
 } as const;

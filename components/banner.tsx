@@ -3,16 +3,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { XIcon } from "lucide-react";
-import Link from "next/link";
-
-import { links } from "@/config";
 
 type BannerProps = {
   hide: boolean;
   setHide: Dispatch<SetStateAction<boolean>>;
 };
 
-const BANNER_KEY = "hide-lingo-banner";
+const BANNER_KEY = "hide-lexora-vocabulary-banner-v1";
 
 const Banner = ({ hide, setHide }: BannerProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -49,29 +46,8 @@ const Banner = ({ hide, setHide }: BannerProps) => {
       <div className="relative w-full">
         <div className="flex items-center justify-center">
           <p className="text-sm font-normal">
-            📢{" "}
-            <strong className="font-semibold">
-              Account creation is currently not working
-            </strong>{" "}
-            due to Clerk&apos;s 500-user limit. To try it out, please{" "}
-            <Link
-              href={`${links.sourceCode}/fork`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-green-600 transition-opacity hover:opacity-75"
-            >
-              fork this repo
-            </Link>{" "}
-            or{" "}
-            <Link
-              href={`mailto:${links.email}`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-green-600 transition-opacity hover:opacity-75"
-            >
-              Contact me
-            </Link>{" "}
-            for access.
+            📢 <strong className="font-semibold">Vocabulary Core MVP:</strong>{" "}
+            learn and review abandon, available, and maintain in the CET-4 demo.
           </p>
         </div>
 
