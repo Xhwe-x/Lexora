@@ -4,6 +4,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { XIcon } from "lucide-react";
 
+import { useI18n } from "@/lib/i18n/provider";
+
 type BannerProps = {
   hide: boolean;
   setHide: Dispatch<SetStateAction<boolean>>;
@@ -12,6 +14,7 @@ type BannerProps = {
 const BANNER_KEY = "hide-lexora-vocabulary-banner-v1";
 
 const Banner = ({ hide, setHide }: BannerProps) => {
+  const { t } = useI18n();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -46,8 +49,11 @@ const Banner = ({ hide, setHide }: BannerProps) => {
       <div className="relative w-full">
         <div className="flex items-center justify-center">
           <p className="text-sm font-normal">
-            📢 <strong className="font-semibold">Vocabulary Core MVP:</strong>{" "}
-            learn and review abandon, available, and maintain in the CET-4 demo.
+            📢{" "}
+            <strong className="font-semibold">
+              {t("marketing.bannerTitle")}
+            </strong>{" "}
+            {t("marketing.bannerBody")}
           </p>
         </div>
 
@@ -58,7 +64,7 @@ const Banner = ({ hide, setHide }: BannerProps) => {
           className="absolute right-0 top-3/4 -translate-y-1/2 rounded-full border border-gray-300 bg-white p-1 opacity-80 hover:opacity-90 sm:top-1/2"
         >
           <XIcon className="size-3" strokeWidth={3} />
-          <span className="sr-only">Close banner</span>
+          <span className="sr-only">{t("common.close")}</span>
         </button>
       </div>
     </div>

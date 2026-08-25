@@ -1,66 +1,43 @@
 import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
+import { translate } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 
-export const Footer = () => {
+const languages = [
+  ["hr.svg", "languages.croatian"],
+  ["es.svg", "languages.spanish"],
+  ["fr.svg", "languages.french"],
+  ["it.svg", "languages.italian"],
+  ["jp.svg", "languages.japanese"],
+] as const;
+
+export const Footer = async () => {
+  const locale = await getRequestLocale();
+
   return (
     <div className="hidden h-20 w-full border-t-2 border-slate-200 p-2 lg:block">
-      <div className="mx-auto flex h-full max-w-screen-lg items-center justify-evenly">
-        <Button size="lg" variant="ghost" className="w-full cursor-default">
-          <Image
-            src="/hr.svg"
-            alt="Croatian"
-            height={30}
-            width={40}
-            className="mr-4 rounded-md"
-          />
-          Croatian
-        </Button>
+      <ul className="mx-auto flex h-full max-w-screen-lg items-center justify-evenly">
+        {languages.map(([icon, key]) => {
+          const label = translate(locale, key);
 
-        <Button size="lg" variant="ghost" className="w-full cursor-default">
-          <Image
-            src="/es.svg"
-            alt="Spanish"
-            height={30}
-            width={40}
-            className="mr-4 rounded-md"
-          />
-          Spanish
-        </Button>
-
-        <Button size="lg" variant="ghost" className="w-full cursor-default">
-          <Image
-            src="/fr.svg"
-            alt="French"
-            height={30}
-            width={40}
-            className="mr-4 rounded-md"
-          />
-          French
-        </Button>
-
-        <Button size="lg" variant="ghost" className="w-full cursor-default">
-          <Image
-            src="/it.svg"
-            alt="Italian"
-            height={30}
-            width={40}
-            className="mr-4 rounded-md"
-          />
-          Italian
-        </Button>
-
-        <Button size="lg" variant="ghost" className="w-full cursor-default">
-          <Image
-            src="/jp.svg"
-            alt="Japanese"
-            height={30}
-            width={40}
-            className="mr-4 rounded-md"
-          />
-          Japanese
-        </Button>
-      </div>
+          return (
+            <li
+              key={key}
+              className="flex w-full items-center justify-center px-3 py-2 text-sm font-bold text-slate-500"
+            >
+              <Image
+                src={`/${icon}`}
+                alt=""
+                aria-hidden="true"
+                height={30}
+                width={40}
+                className="mr-4 rounded-md"
+              />
+              {label}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 };

@@ -4,6 +4,8 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { courses } from "@/db/schema";
+import { translate } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 type UserProgressProps = {
   activeCourse: typeof courses.$inferSelect;
@@ -12,16 +14,18 @@ type UserProgressProps = {
   hasActiveSubscription: boolean;
 };
 
-export const UserProgress = ({
+export const UserProgress = async ({
   activeCourse,
   hearts,
   points,
   hasActiveSubscription,
 }: UserProgressProps) => {
+  const locale = await getRequestLocale();
+
   return (
     <div className="flex w-full items-center justify-between gap-x-2">
-      <Link href="/courses" prefetch>
-        <Button variant="ghost">
+      <Button variant="ghost" asChild>
+        <Link href="/courses" prefetch>
           <Image
             src={activeCourse.imageSrc}
             alt={activeCourse.title}
@@ -29,29 +33,29 @@ export const UserProgress = ({
             width={32}
             height={32}
           />
-        </Button>
-      </Link>
+        </Link>
+      </Button>
 
-      <Link href="/shop" prefetch>
-        <Button variant="ghost" className="text-orange-500">
+      <Button variant="ghost" className="text-orange-500" asChild>
+        <Link href="/shop" prefetch>
           <Image
             src="/points.svg"
             height={28}
             width={28}
-            alt="Points"
+            alt={translate(locale, "common.points")}
             className="mr-2"
           />
           {points}
-        </Button>
-      </Link>
+        </Link>
+      </Button>
 
-      <Link href="/shop" prefetch>
-        <Button variant="ghost" className="text-rose-500">
+      <Button variant="ghost" className="text-rose-500" asChild>
+        <Link href="/shop" prefetch>
           <Image
             src="/heart.svg"
             height={22}
             width={22}
-            alt="Hearts"
+            alt={translate(locale, "common.hearts")}
             className="mr-2"
           />
           {hasActiveSubscription ? (
@@ -59,8 +63,8 @@ export const UserProgress = ({
           ) : (
             hearts
           )}
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     </div>
   );
 };

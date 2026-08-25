@@ -13,8 +13,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Banner from "@/components/banner";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { links } from "@/config";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 
 type HeaderProps = {
@@ -22,6 +24,7 @@ type HeaderProps = {
 };
 
 export const Header = ({ authEnabled }: HeaderProps) => {
+  const { t } = useI18n();
   const [hideBanner, setHideBanner] = useState(true);
 
   return (
@@ -48,11 +51,12 @@ export const Header = ({ authEnabled }: HeaderProps) => {
           </Link>
 
           <div className="flex gap-x-3">
+            <LocaleSwitcher compact />
             {authEnabled ? (
               <ClerkHeaderActions />
             ) : (
               <span className="self-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
-                Preview
+                {t("marketing.previewBadge")}
               </span>
             )}
             <Link
@@ -63,7 +67,7 @@ export const Header = ({ authEnabled }: HeaderProps) => {
             >
               <Image
                 src="/github.svg"
-                alt="Source Code"
+                alt={t("common.sourceCode")}
                 height={20}
                 width={20}
               />
@@ -76,6 +80,8 @@ export const Header = ({ authEnabled }: HeaderProps) => {
 };
 
 function ClerkHeaderActions() {
+  const { t } = useI18n();
+
   return (
     <>
       <ClerkLoading>
@@ -89,7 +95,7 @@ function ClerkHeaderActions() {
         <Show when="signed-out">
           <SignInButton mode="modal">
             <Button size="lg" variant="ghost">
-              Login
+              {t("common.login")}
             </Button>
           </SignInButton>
         </Show>

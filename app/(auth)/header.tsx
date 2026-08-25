@@ -13,11 +13,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Banner from "@/components/banner";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { links } from "@/config";
+import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 
 export const Header = () => {
+  const { t } = useI18n();
   const { isSignedIn } = useAuth();
   const [hideBanner, setHideBanner] = useState(true);
 
@@ -45,6 +48,7 @@ export const Header = () => {
           </Link>
 
           <div className="flex gap-x-3">
+            <LocaleSwitcher compact />
             <ClerkLoading>
               <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
             </ClerkLoading>
@@ -53,7 +57,7 @@ export const Header = () => {
               <Show when="signed-out">
                 <SignInButton>
                   <Button size="lg" variant="ghost">
-                    Login
+                    {t("common.login")}
                   </Button>
                 </SignInButton>
               </Show>
@@ -66,7 +70,7 @@ export const Header = () => {
               >
                 <Image
                   src="/github.svg"
-                  alt="Source Code"
+                  alt={t("common.sourceCode")}
                   height={20}
                   width={20}
                 />

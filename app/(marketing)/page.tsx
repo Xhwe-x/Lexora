@@ -10,9 +10,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { translate } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 import { isClerkConfigured } from "@/lib/preview-mode";
 
-export default function MarketingPage() {
+export default async function MarketingPage() {
+  const locale = await getRequestLocale();
   const authEnabled = isClerkConfigured({
     publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     secretKey: process.env.CLERK_SECRET_KEY,
@@ -26,7 +29,7 @@ export default function MarketingPage() {
 
       <div className="flex flex-col items-center gap-y-8">
         <h1 className="max-w-[480px] text-center text-xl font-bold text-neutral-600 lg:text-3xl">
-          Build vocabulary you can recall, type, and use with Lexora.
+          {translate(locale, "marketing.headline")}
         </h1>
 
         <div className="flex w-full max-w-[330px] flex-col items-center gap-y-3">
@@ -45,7 +48,7 @@ export default function MarketingPage() {
                     asChild
                   >
                     <Link href="/learn" prefetch>
-                      Continue Learning
+                      {translate(locale, "navigation.learn")}
                     </Link>
                   </Button>
                 </Show>
@@ -53,7 +56,7 @@ export default function MarketingPage() {
                 <Show when="signed-out">
                   <SignUpButton mode="modal">
                     <Button size="lg" variant="secondary" className="w-full">
-                      Get Started
+                      {translate(locale, "marketing.getStarted")}
                     </Button>
                   </SignUpButton>
 
@@ -63,7 +66,7 @@ export default function MarketingPage() {
                       variant="primaryOutline"
                       className="w-full"
                     >
-                      I already have an account
+                      {translate(locale, "marketing.existingAccount")}
                     </Button>
                   </SignInButton>
                 </Show>
@@ -71,9 +74,11 @@ export default function MarketingPage() {
             </>
           ) : (
             <div className="w-full rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-center">
-              <p className="font-bold text-amber-700">Public Preview Mode</p>
+              <p className="font-bold text-amber-700">
+                {translate(locale, "marketing.previewTitle")}
+              </p>
               <p className="mt-1 text-sm text-amber-700/80">
-                Configure Clerk in .env.local to enable sign-in and lessons.
+                {translate(locale, "marketing.previewDescription")}
               </p>
             </div>
           )}
