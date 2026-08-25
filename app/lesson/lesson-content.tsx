@@ -4,11 +4,10 @@ import { VocabularyLesson } from "@/components/vocabulary-lesson/vocabulary-less
 import {
   getCourseProgress,
   getLesson,
-  getLessonMode,
   getUserProgress,
   getUserSubscription,
-  getVocabularyLesson,
 } from "@/db/queries";
+import { getVocabularyLesson } from "@/db/vocabulary-queries";
 import { buildVocabularySession } from "@/lib/vocabulary/session-builder";
 
 import { Quiz } from "./quiz";
@@ -27,14 +26,10 @@ export async function LessonContent({ lessonId }: LessonContentProps) {
 
   if (!resolvedLessonId || !userProgress) redirect("/learn");
 
-  const mode = await getLessonMode(resolvedLessonId);
+  const vocabularyLesson = await getVocabularyLesson(resolvedLessonId);
 
-  if (mode === "VOCABULARY") {
-    const lesson = await getVocabularyLesson(resolvedLessonId);
-
-    if (!lesson || lesson.lessonWords.length === 0) redirect("/learn");
-
-    const words = lesson.lessonWords.map(({ word }) => ({
+  if (vocabularyLesson?.lessonWords.length) {
+    const words = vocabularyLesson.lessonWords.map(({ word }) => ({
       id: word.id,
       word: word.word,
       translationCn: word.translationCn,
@@ -45,7 +40,7 @@ export async function LessonContent({ lessonId }: LessonContentProps) {
       })),
     }));
     const initialMasteryLevels = Object.fromEntries(
-      lesson.lessonWords.map(({ word }) => [
+      vocabularyLesson.lessonWords.map(({ word }) => [
         word.id,
         word.userWordProgress[0]?.masteryLevel ?? 0,
       ])
@@ -53,7 +48,7 @@ export async function LessonContent({ lessonId }: LessonContentProps) {
 
     return (
       <VocabularyLesson
-        lessonId={lesson.id}
+        lessonId={vocabularyLesson.id}
         initialHearts={userProgress.hearts}
         hasActiveSubscription={!!userSubscription?.isActive}
         initialExercises={buildVocabularySession(words)}

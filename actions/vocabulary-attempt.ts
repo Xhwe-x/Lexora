@@ -28,36 +28,42 @@ export async function submitVocabularyAttempt(input: VocabularyAttemptInput) {
 
   validateVocabularyAttemptInput(input);
 
-  const lessonWord = await db.query.lessonWords.findFirst({
-    where: and(
-      eq(lessonWords.lessonId, input.lessonId),
-      eq(lessonWords.wordId, input.wordId)
-    ),
-    with: { word: true },
-  });
+  const isContextExercise = input.exerciseType === "CONTEXT_INPUT";
 
-  if (!lessonWord) throw new Error("Word is not part of this lesson.");
-
-  if (input.exerciseType === "CONTEXT_INPUT") {
-    if (!input.exampleId) throw new Error("Context example is required.");
-
-    const example = await db.query.wordExamples.findFirst({
-      where: and(
-        eq(wordExamples.id, input.exampleId),
-        eq(wordExamples.wordId, input.wordId)
-      ),
-      columns: { id: true },
-    });
-
-    if (!example) throw new Error("Example is not part of this word.");
+  if (isContextExercise && !input.exampleId) {
+    throw new Error("Context example is required.");
   }
 
-  const currentUserProgress = await db.query.userProgress.findFirst({
-    where: eq(userProgress.userId, userId),
-    columns: { userId: true },
-  });
+  const contextExampleId = input.exampleId ?? 0;
 
+  const [lessonWord, currentUserProgress, example] = await Promise.all([
+    db.query.lessonWords.findFirst({
+      where: and(
+        eq(lessonWords.lessonId, input.lessonId),
+        eq(lessonWords.wordId, input.wordId)
+      ),
+      with: { word: true },
+    }),
+    db.query.userProgress.findFirst({
+      where: eq(userProgress.userId, userId),
+      columns: { userId: true },
+    }),
+    isContextExercise
+      ? db.query.wordExamples.findFirst({
+          where: and(
+            eq(wordExamples.id, contextExampleId),
+            eq(wordExamples.wordId, input.wordId)
+          ),
+          columns: { id: true },
+        })
+      : Promise.resolve(null),
+  ]);
+
+  if (!lessonWord) throw new Error("Word is not part of this lesson.");
   if (!currentUserProgress) throw new Error("User progress not found.");
+  if (isContextExercise && !example) {
+    throw new Error("Example is not part of this word.");
+  }
 
   const correctAnswer =
     input.exerciseType === "MEANING_CHOICE"

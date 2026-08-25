@@ -10,7 +10,6 @@ import {
   challengeProgress,
   courses,
   lessons,
-  lessonWords,
   units,
   userProgress,
   userSubscription,
@@ -114,54 +113,12 @@ export const getCourseProgress = cache(async () => {
   };
 });
 
-export const getLessonMode = cache(async (lessonId: number) => {
-  const vocabularyWord = await db.query.lessonWords.findFirst({
-    where: eq(lessonWords.lessonId, lessonId),
-    columns: { id: true },
-  });
-
-  return vocabularyWord ? ("VOCABULARY" as const) : ("LEGACY" as const);
-});
-
-export const getVocabularyLesson = cache(async (lessonId: number) => {
-  const { userId } = await auth();
-
-  if (!userId) return null;
-
-  return db.query.lessons.findFirst({
-    where: eq(lessons.id, lessonId),
-    with: {
-      unit: {
-        with: {
-          course: true,
-        },
-      },
-      lessonWords: {
-        orderBy: (lessonWords, { asc }) => [asc(lessonWords.order)],
-        with: {
-          word: {
-            with: {
-              examples: {
-                orderBy: (examples, { asc }) => [asc(examples.id)],
-              },
-              userWordProgress: {
-                where: eq(userWordProgress.userId, userId),
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-});
-
 export const getLesson = cache(async (id?: number) => {
   const { userId } = await auth();
 
   if (!userId) return null;
 
-  const courseProgress = await getCourseProgress();
-  const lessonId = id || courseProgress?.activeLessonId;
+  const lessonId = id ?? (await getCourseProgress())?.activeLessonId;
 
   if (!lessonId) return null;
 
