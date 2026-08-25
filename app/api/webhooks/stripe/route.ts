@@ -5,20 +5,31 @@ import Stripe from "stripe";
 
 import db from "@/db/drizzle";
 import { userSubscription } from "@/db/schema";
-import { stripe } from "@/lib/stripe";
+import { isStripeKeyConfigured } from "@/lib/stripe-config";
+import { getStripeClient } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
+  const stripe = getStripeClient();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripe || !isStripeKeyConfigured(webhookSecret)) {
+    return NextResponse.json(
+      { error: "Stripe is not configured." },
+      { status: 503 }
+    );
+  }
+
   const body = await req.text();
-  const signature = (await headers()).get("Stripe-Signature") as string;
+  const signature = (await headers()).get("Stripe-Signature");
+
+  if (!signature) {
+    return new NextResponse("Stripe signature is required.", { status: 400 });
+  }
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret!);
   } catch (error: unknown) {
     return new NextResponse(`Webhook error ${JSON.stringify(error)}`, {
       status: 400,

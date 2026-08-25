@@ -3,7 +3,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 import { getUserSubscription } from "@/db/queries";
-import { stripe } from "@/lib/stripe";
+import { getStripeClient } from "@/lib/stripe";
 import { absoluteUrl } from "@/lib/utils";
 
 const returnUrl = absoluteUrl("/shop");
@@ -13,6 +13,10 @@ export const createStripeUrl = async () => {
   const user = await currentUser();
 
   if (!userId || !user) throw new Error("Unauthorized.");
+
+  const stripe = getStripeClient();
+
+  if (!stripe) return { error: "stripe_unavailable" as const };
 
   const userSubscription = await getUserSubscription();
 

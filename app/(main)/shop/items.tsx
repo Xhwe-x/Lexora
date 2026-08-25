@@ -14,12 +14,14 @@ type ItemsProps = {
   hearts: number;
   points: number;
   hasActiveSubscription: boolean;
+  stripeEnabled: boolean;
 };
 
 export const Items = ({
   hearts,
   points,
   hasActiveSubscription,
+  stripeEnabled,
 }: ItemsProps) => {
   const [pending, startTransition] = useTransition();
 
@@ -32,11 +34,23 @@ export const Items = ({
   };
 
   const onUpgrade = () => {
+    if (!stripeEnabled) {
+      toast.error("Stripe is not configured for this local environment.");
+      return;
+    }
+
     toast.loading("Redirecting to checkout...");
     startTransition(() => {
       createStripeUrl()
         .then((response) => {
-          if (response.data) window.location.href = response.data;
+          if ("error" in response && response.error === "stripe_unavailable") {
+            toast.error("Stripe is not configured for this local environment.");
+            return;
+          }
+
+          if ("data" in response && response.data) {
+            window.location.href = response.data;
+          }
         })
         .catch(() => toast.error("Something went wrong."));
     });
@@ -83,8 +97,16 @@ export const Items = ({
           </p>
         </div>
 
-        <Button onClick={onUpgrade} disabled={pending} aria-disabled={pending}>
-          {hasActiveSubscription ? "settings" : "upgrade"}
+        <Button
+          onClick={onUpgrade}
+          disabled={pending || !stripeEnabled}
+          aria-disabled={pending || !stripeEnabled}
+        >
+          {!stripeEnabled
+            ? "unavailable"
+            : hasActiveSubscription
+              ? "settings"
+              : "upgrade"}
         </Button>
       </div>
     </ul>
