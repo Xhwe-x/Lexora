@@ -5,6 +5,7 @@ import { Nunito } from "next/font/google";
 import { ExitModal } from "@/components/modals/exit-modal";
 import { HeartsModal } from "@/components/modals/hearts-modal";
 import { PracticeModal } from "@/components/modals/practice-modal";
+import { SkipLink } from "@/components/skip-link";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config";
 import { LocaleProvider } from "@/lib/i18n/provider";
@@ -35,6 +36,7 @@ export default async function RootLayout({
     <html lang={initialLocale}>
       <body className={font.className}>
         <LocaleProvider initialLocale={initialLocale}>
+          <SkipLink />
           <Toaster theme="light" richColors closeButton />
           <ExitModal />
           <HeartsModal />
