@@ -147,7 +147,7 @@ STRIPE_API_SECRET_KEY="replace_with_stripe_secret_key"
 STRIPE_WEBHOOK_SECRET="replace_with_stripe_webhook_secret"
 
 # public app url
-NEXT_PUBLIC_APP_URL=http://127.0.0.1:3100
+NEXT_PUBLIC_APP_URL=http://localhost:3100
 
 # clerk admin user id(s) separated by comma (,)
 CLERK_ADMIN_IDS="user_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -181,7 +181,7 @@ CLERK_ADMIN_IDS="user_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 8. Specify Public App URL
    1. **Procedure**:
-      - Replace `http://127.0.0.1:3100` with the URL of your deployed application.
+      - Replace `http://localhost:3100` with the URL of your deployed application.
 
 9. Identify Clerk Admin User IDs
    1. **Source**: Clerk Dashboard or Settings Page
@@ -210,7 +210,7 @@ This command uses `tsx` to execute the Typescript file (`scripts/prod.ts`) and w
 
 Once the script completes, check your database to ensure that the challenges data has been successfully seeded.
 
-14. Start the app with `pnpm dev`, then open `http://127.0.0.1:3100`.
+14. Start the app with `pnpm dev`, then open `http://localhost:3100`.
 
 ### Public preview without credentials
 

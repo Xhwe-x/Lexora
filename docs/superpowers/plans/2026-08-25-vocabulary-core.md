@@ -7,19 +7,19 @@
 
 Implementation is active on `feat/vocabulary-core`.
 
-| Area                                 | Status        | Verification                                |
-| ------------------------------------ | ------------- | ------------------------------------------- |
-| Git baseline and test runner         | Complete      | Vitest starts and runs repository tests     |
-| Vocabulary types and normalization   | Complete      | Unit tests                                  |
-| Vocabulary database schema           | Code complete | Lint and TypeScript; real `db:push` pending |
-| Three-word CET-4 Seed                | Code complete | Lint and TypeScript; real Seed pending      |
-| Server answer evaluation             | Complete      | Unit tests                                  |
-| Session builder and delayed retries  | Complete      | Deterministic unit tests                    |
-| Lesson queries and map compatibility | Complete      | Unit tests, lint, TypeScript                |
-| Attempt persistence action           | Code complete | Domain tests; real database test pending    |
-| Vocabulary Lesson UI                 | Code complete | Flow tests, lint, TypeScript                |
-| Public preview mode                  | Complete      | Browser and HTTP verification               |
-| Authenticated end-to-end acceptance  | Blocked       | Requires real Neon and Clerk configuration  |
+| Area                                 | Status        | Verification                                      |
+| ------------------------------------ | ------------- | ------------------------------------------------- |
+| Git baseline and test runner         | Complete      | Vitest starts and runs repository tests           |
+| Vocabulary types and normalization   | Complete      | Unit tests                                        |
+| Vocabulary database schema           | Complete      | `db:push` applied successfully to Neon            |
+| Three-word CET-4 Seed                | Complete      | Two runs and database counts confirm idempotency  |
+| Server answer evaluation             | Complete      | Unit tests                                        |
+| Session builder and delayed retries  | Complete      | Deterministic unit tests                          |
+| Lesson queries and map compatibility | Complete      | Unit tests, lint, TypeScript                      |
+| Attempt persistence action           | Code complete | Domain tests; real database test pending          |
+| Vocabulary Lesson UI                 | Code complete | Flow tests, lint, TypeScript                      |
+| Public preview mode                  | Complete      | Browser and HTTP verification                     |
+| Authenticated end-to-end acceptance  | In progress   | Clerk loaded; user sign-in and Lesson flow remain |
 
 ## Current scope
 
@@ -94,7 +94,9 @@ and Hearts update atomically.
 ## Public preview mode
 
 On this Windows environment, port `3000` belongs to an excluded TCP range.
-`pnpm dev` therefore listens on `127.0.0.1:3100`.
+`pnpm dev` therefore listens on `localhost:3100`. Clerk's development flow
+also targets `localhost`, so binding only to `127.0.0.1` is not sufficient on
+this Windows environment.
 
 When Clerk is not configured:
 
@@ -110,13 +112,16 @@ paths are used.
 
 Create `.env.local` in the project root. It is ignored by Git.
 
+Standalone Drizzle and Seed commands load `.env.local` first and fall back to
+`.env`, matching the local setup documented in this repository.
+
 Required for authenticated vocabulary acceptance:
 
 ```env
 DATABASE_URL="..."
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="..."
 CLERK_SECRET_KEY="..."
-NEXT_PUBLIC_APP_URL="http://127.0.0.1:3100"
+NEXT_PUBLIC_APP_URL="http://localhost:3100"
 ```
 
 Stripe values are needed only when exercising the legacy subscription and
@@ -124,17 +129,23 @@ webhook flows.
 
 ## Remaining acceptance steps
 
-After real local configuration is available:
+Database setup evidence already collected:
 
-1. Run `pnpm db:push` and verify all five vocabulary tables.
-2. Run `pnpm db:vocab-demo` twice and confirm idempotency.
-3. Select the CET-4 Demo course and complete all three exercise types.
-4. Submit `availble`, verify correction input, then verify delayed retry.
-5. Reduce Hearts to zero and confirm the Lesson continues.
-6. Confirm `exercise_attempts`, `user_word_progress`, XP, and Hearts persisted.
-7. Refresh during a Lesson and confirm persisted progress remains.
-8. Open a legacy SELECT/ASSIST Lesson and verify regression behavior.
-9. Run the final verification suite:
+- `pnpm db:push` applied the schema successfully;
+- `pnpm db:vocab-demo` succeeded twice;
+- Neon contains exactly three target words, three examples, one Demo Course,
+  one Demo Unit, one Demo Lesson, and three ordered Lesson–Word links.
+
+Remaining acceptance steps:
+
+1. Sign in and select the CET-4 Demo course.
+2. Complete all three exercise types.
+3. Submit `availble`, verify correction input, then verify delayed retry.
+4. Reduce Hearts to zero and confirm the Lesson continues.
+5. Confirm `exercise_attempts`, `user_word_progress`, XP, and Hearts persisted.
+6. Refresh during a Lesson and confirm persisted progress remains.
+7. Open a legacy SELECT/ASSIST Lesson and verify regression behavior.
+8. Run the final verification suite:
 
    ```powershell
    pnpm test:run
