@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { cn } from "@/lib/utils";
 import {
   buildTypingFeedback,
@@ -25,7 +27,12 @@ export function WordInputTrack({
 }: WordInputTrackProps) {
   const { t } = useI18n();
   const isDesktop = useMedia("(min-width: 768px)");
+  const inputRef = useRef<HTMLInputElement>(null);
   const cells = buildTypingFeedback({ value, targetLength });
+
+  useEffect(() => {
+    if (isDesktop && !disabled) inputRef.current?.focus();
+  }, [disabled, isDesktop]);
 
   return (
     <label className="block space-y-3">
@@ -41,7 +48,7 @@ export function WordInputTrack({
         </div>
         <input
           aria-label={label}
-          autoFocus={isDesktop}
+          ref={inputRef}
           autoComplete="off"
           autoCapitalize="none"
           inputMode="text"

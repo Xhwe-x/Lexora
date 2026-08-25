@@ -27,7 +27,7 @@ export function VocabularyCompletion({
   const { t } = useI18n();
   const router = useRouter();
   const { width, height } = useWindowSize();
-  const reduceMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const reduceMotion = useMedia("(prefers-reduced-motion: reduce)", true);
 
   return (
     <>

@@ -60,7 +60,7 @@ export const Items = ({
 
   return (
     <ul className="w-full">
-      <div className="flex w-full items-center gap-x-4 border-t-2 p-4">
+      <li className="flex w-full items-center gap-x-4 border-t-2 p-4">
         <Image src="/heart.svg" alt="Heart" height={60} width={60} />
 
         <div className="flex-1">
@@ -88,9 +88,9 @@ export const Items = ({
             </div>
           )}
         </Button>
-      </div>
+      </li>
 
-      <div className="flex w-full items-center gap-x-4 border-t-2 p-4 pt-8">
+      <li className="flex w-full items-center gap-x-4 border-t-2 p-4 pt-8">
         <Image src="/unlimited.svg" alt="Unlimited" height={60} width={60} />
 
         <div className="flex-1">
@@ -110,7 +110,7 @@ export const Items = ({
               ? t("common.settings")
               : t("common.upgrade")}
         </Button>
-      </div>
+      </li>
     </ul>
   );
 };

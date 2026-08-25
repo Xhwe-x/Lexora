@@ -14,13 +14,13 @@ import {
 import { useRouter } from "next/navigation";
 
 import { LOCALE_COOKIE, type Locale } from "./config";
-import { translate } from "./messages";
+import { translate, type MessageKey } from "./messages";
 
 type I18nContextValue = {
   locale: Locale;
   isPending: boolean;
   setLocale: (locale: Locale) => void;
-  t: (key: string) => string;
+  t: (key: MessageKey) => string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);

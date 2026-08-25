@@ -114,7 +114,7 @@ const zhCN = {
 
 type MessageKey = keyof typeof zhCN;
 type Dictionary = Record<MessageKey, string>;
-type LooseDictionaries = Record<Locale, Record<string, string>>;
+export type LooseDictionaries = Record<Locale, Record<string, string>>;
 
 const en: Dictionary = {
   "brand.tagline": "Master vocabulary through active recall",
@@ -239,10 +239,16 @@ export const messages = {
 
 export type { MessageKey };
 
+export function translate(locale: Locale, key: MessageKey): string;
+export function translate(
+  locale: Locale,
+  key: string,
+  dictionaries: LooseDictionaries
+): string;
 export function translate(
   locale: Locale,
   key: string,
   dictionaries: LooseDictionaries = messages
-) {
+): string {
   return dictionaries[locale]?.[key] ?? dictionaries["zh-CN"]?.[key] ?? key;
 }

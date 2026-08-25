@@ -61,7 +61,7 @@ const QuestsPage = async () => {
               const progress = (userProgress.points / quest.value) * 100;
 
               return (
-                <div
+                <li
                   className="flex w-full items-center gap-x-4 border-t-2 p-4"
                   key={quest.title}
                 >
@@ -79,7 +79,7 @@ const QuestsPage = async () => {
 
                     <Progress value={progress} className="h-3" />
                   </div>
-                </div>
+                </li>
               );
             })}
           </ul>
