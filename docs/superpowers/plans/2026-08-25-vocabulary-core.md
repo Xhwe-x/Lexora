@@ -7,23 +7,42 @@
 
 Implementation is active on `feat/vocabulary-core`.
 
-| Area                                 | Status        | Verification                                      |
-| ------------------------------------ | ------------- | ------------------------------------------------- |
-| Git baseline and test runner         | Complete      | Vitest starts and runs repository tests           |
-| Vocabulary types and normalization   | Complete      | Unit tests                                        |
-| Vocabulary database schema           | Complete      | `db:push` applied successfully to Neon            |
-| Three-word CET-4 Seed                | Complete      | Two runs and database counts confirm idempotency  |
-| Server answer evaluation             | Complete      | Unit tests                                        |
-| Session builder and delayed retries  | Complete      | Deterministic unit tests                          |
-| Lesson queries and map compatibility | Complete      | Unit tests, lint, TypeScript                      |
-| Attempt persistence action           | Code complete | Domain tests; real database test pending          |
-| Vocabulary Lesson UI                 | Code complete | Flow tests, lint, TypeScript                      |
-| Public preview mode                  | Complete      | Browser and HTTP verification                     |
-| Authenticated end-to-end acceptance  | In progress   | Clerk loaded; user sign-in and Lesson flow remain |
+| Area                                 | Status      | Verification                                       |
+| ------------------------------------ | ----------- | -------------------------------------------------- |
+| Git baseline and test runner         | Complete    | Vitest starts and runs repository tests            |
+| Vocabulary types and normalization   | Complete    | Unit tests                                         |
+| Vocabulary database schema           | Complete    | `db:push` applied successfully to Neon             |
+| Three-word CET-4 Seed                | Complete    | Two runs and database counts confirm idempotency   |
+| Server answer evaluation             | Complete    | Unit tests                                         |
+| Session builder and delayed retries  | Complete    | Deterministic unit tests                           |
+| Lesson queries and map compatibility | Complete    | Unit tests, lint, TypeScript                       |
+| Attempt persistence action           | Complete    | Domain tests and real Neon records                 |
+| Vocabulary Lesson UI                 | Complete    | Component, flow, desktop and 390px browser tests   |
+| Public preview mode                  | Complete    | Browser and HTTP verification                      |
+| Authenticated end-to-end acceptance  | In progress | Core loop verified; final completion rerun remains |
 
 The stale upstream account-limit banner was replaced with a Lexora Vocabulary
 Core status banner so new Clerk users are not incorrectly told registration is
 disabled.
+
+The vocabulary UI now renders the English prompt above meaning choices and uses
+a Julebu-inspired keyboard-first letter track for spelling and context input.
+Before submission, letters remain neutral; after a wrong answer, the first
+attempt is shown with per-character correct, wrong, and missing states. The
+server remains authoritative for formal scoring.
+
+Authenticated browser acceptance verified correct meaning feedback, XP, Hearts,
+wrong spelling, mandatory correction without a duplicate Attempt, a delayed
+type-switched retry, context input, responsive layout, and Neon persistence.
+During acceptance, revalidating the active `/lesson` route caused an early map
+redirect as soon as all words reached Lv.1. Vocabulary attempts now revalidate
+map surfaces without invalidating the active Lesson; client queue completion is
+the sole trigger for the completion screen.
+
+Stripe remains optional for the Vocabulary Core milestone. Without Stripe keys,
+the Shop renders normally with its upgrade control disabled, checkout returns a
+clear unavailable result, and the webhook returns HTTP 503 instead of crashing
+at module import.
 
 ## Current scope
 
