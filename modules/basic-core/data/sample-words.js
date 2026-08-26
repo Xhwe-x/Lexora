@@ -1,0 +1,22 @@
+export const sampleWords = [
+  { id: 'ability', term: 'ability', meaning: '能力', example: 'Practice improves your ability to speak.', level: 'A2', category: 'daily' },
+  { id: 'achieve', term: 'achieve', meaning: '实现；达到', example: 'Small steps help you achieve big goals.', level: 'B1', category: 'study' },
+  { id: 'advice', term: 'advice', meaning: '建议', example: 'She gave me useful advice.', level: 'A2', category: 'daily' },
+  { id: 'agree', term: 'agree', meaning: '同意', example: 'I agree with your idea.', level: 'A2', category: 'conversation' },
+  { id: 'answer', term: 'answer', meaning: '回答；答案', example: 'Please answer the question.', level: 'A1', category: 'study' },
+  { id: 'because', term: 'because', meaning: '因为', example: 'I stayed home because it was raining.', level: 'A1', category: 'grammar' },
+  { id: 'believe', term: 'believe', meaning: '相信', example: 'I believe you can do it.', level: 'A2', category: 'conversation' },
+  { id: 'change', term: 'change', meaning: '改变', example: 'A new habit can change your day.', level: 'A1', category: 'daily' },
+  { id: 'choose', term: 'choose', meaning: '选择', example: 'Choose the best answer.', level: 'A2', category: 'study' },
+  { id: 'continue', term: 'continue', meaning: '继续', example: 'Continue reading for ten minutes.', level: 'A2', category: 'study' },
+  { id: 'different', term: 'different', meaning: '不同的', example: 'These two words have different meanings.', level: 'A1', category: 'daily' },
+  { id: 'enough', term: 'enough', meaning: '足够的', example: 'Ten minutes is enough for today.', level: 'A2', category: 'daily' },
+  { id: 'example', term: 'example', meaning: '例子', example: 'This sentence is a simple example.', level: 'A1', category: 'study' },
+  { id: 'improve', term: 'improve', meaning: '提高；改善', example: 'Reading can improve your vocabulary.', level: 'A2', category: 'study' },
+  { id: 'learn', term: 'learn', meaning: '学习', example: 'I learn English every day.', level: 'A1', category: 'study' },
+  { id: 'remember', term: 'remember', meaning: '记住', example: 'Try to remember this phrase.', level: 'A2', category: 'study' },
+  { id: 'simple', term: 'simple', meaning: '简单的', example: 'Start with a simple sentence.', level: 'A1', category: 'daily' },
+  { id: 'speak', term: 'speak', meaning: '说；讲', example: 'Do not be afraid to speak English.', level: 'A1', category: 'conversation' },
+  { id: 'understand', term: 'understand', meaning: '理解', example: 'I understand the main idea.', level: 'A2', category: 'study' },
+  { id: 'usually', term: 'usually', meaning: '通常', example: 'I usually study after dinner.', level: 'A2', category: 'daily' }
+];

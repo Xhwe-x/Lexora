@@ -1,0 +1,1 @@
+export const readingText = `Learning English does not require a complicated system. A small daily habit can be more useful than a long study session once a week. Read something interesting, notice useful words, listen to how they sound, and use them in your own sentences. When you meet a difficult word, try to understand it from the context before checking the meaning.`

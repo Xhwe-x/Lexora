@@ -1,346 +1,132 @@
-<a name="readme-top"></a>
+# Lexora
 
-# Lexora - Interactive vocabulary and language learning.
+> **把“背单词”变成一段每天愿意回来的学习旅程。**
 
-Lexora is being developed from the original Lingo Duolingo clone. The current
-feature branch adds a three-word CET-4 vocabulary-learning core while keeping
-the legacy lesson flow compatible.
+Lexora 是一款本地优先的连续英语学习器：用短而有节奏的学习 Session 帮你认识新词、主动回忆、及时复习，再把词汇带回真实句子与阅读场景中。
 
-![Lexora vocabulary learning interface](/.github/images/img_main.png "Lexora vocabulary learning interface")
+它不要求账号、不依赖数据库，也不强制接入 AI API。学习数据保存在当前浏览器里，项目可以直接作为静态站点部署。
 
-[![GitHub license](https://flat.badgen.net/github/license/Xhwe-x/Lexora?icon=github&color=black&scale=1.01)](https://github.com/Xhwe-x/Lexora/blob/main/LICENSE "GitHub license")
-[![Maintenance](https://flat.badgen.net/static/Maintained/yes?icon=github&color=black&scale=1.01)](https://github.com/Xhwe-x/Lexora/commits/main "Maintenance")
-[![GitHub issues](https://flat.badgen.net/github/issues/Xhwe-x/Lexora?icon=github&scale=1.01)](https://github.com/Xhwe-x/Lexora/issues "GitHub issues")
+## ✦ 核心体验
 
-<!-- Table of Contents -->
-<details>
+### Learn Session · 每天学一点
 
-<summary>
+- Daily 与 Review 共用同一套 Session Engine；
+- 新词遵循“理解 → 识别 → 主动回忆”的渐进路径；
+- 错题通过 delayed retry 回到学习流，最多重试 2 次，不制造虚假的进度；
+- 每次作答后给出清晰的答案对照与即时反馈；
+- 完成页展示核心练习、首次答对、曾答错、retry 与需留意词。
 
-# :notebook_with_decorative_cover: Table of Contents
+### Reader · 在语境里记住
 
-</summary>
+- 沉浸式 Reading Canvas，编辑文本收纳到次级编辑器中；
+- 可调整字号、行距、正文宽度与 Serif / Sans 阅读风格；
+- 点击正文单词即可查词，本地词库命中后可以加入学习计划；
+- 文档、阅读偏好与滚动进度保存在浏览器本地。
 
-- [Folder Structure](#bangbang-folder-structure)
-- [Getting Started](#toolbox-getting-started)
-- [Screenshots](#camera-screenshots)
-- [Tech Stack](#gear-tech-stack)
-- [Stats](#wrench-stats)
-- [Contribute](#raised_hands-contribute)
-- [Acknowledgements](#gem-acknowledgements)
-- [Buy Me a Coffee](#coffee-buy-me-a-coffee)
-- [Follow Me](#rocket-follow-me)
-- [Learn More](#books-learn-more)
-- [Deploy on Vercel](#page_with_curl-deploy-on-vercel)
-- [Give A Star](#star-give-a-star)
-- [Star History](#star2-star-history)
-- [Give A Star](#star-give-a-star)
+### Review Center · 知道现在该复习什么
 
-</details>
+- 以唯一主行动引导复习，减少选择负担；
+- 聚合到期词与仍未纠正的近期错词；
+- 用“需加强 / 学习中 / 较稳定”呈现可解释的词汇状态；
+- 没有到期内容时，自然引导回到 Reader，而不是制造刷题压力。
 
-## :bangbang: Folder Structure
+### My · 看见自己的成长
 
-Here is the folder structure of this app.
+- 连续学习、已学习词、有效复习与本周学习天数；
+- 真实的 7-day consistency strip；
+- 每日新词计划与词汇成长分层；
+- 设置与危险操作保持克制，并明确提示数据只保存在当前浏览器。
 
-<!--- FOLDER_STRUCTURE_START --->
+### Speech · 轻量而及时的发音
+
+统一的 `SpeechButton` 服务于 Learn Session、WordCard 与 Reader：只有真正开始播放时才出现动效，播放结束、取消或出错后立即收敛；在减少动效偏好下自动关闭扩散动画。
+
+## ▣ 快速开始
+
+环境要求：**Node.js 20+**。
 
 ```bash
+npm install
+npm run dev
+```
+
+然后打开终端提示的本地地址即可开始体验。
+
+> 请不要跨 Windows、macOS、Linux 复制 `node_modules`。Rollup、esbuild 等依赖包含平台相关的可选原生包，请在目标系统重新执行 `npm install`。
+
+## ◌ 验证命令
+
+```bash
+# 领域级 Node 测试
+npm run test:domain
+
+# 模块级 Node 测试
+npm run test:modules
+
+# 完整测试
+npm test
+
+# 类型检查与生产构建
+npm run build
+
+# 一次执行全部验证
+npm run verify
+```
+
+## ◫ 项目结构
+
+```text
 Lexora/
-  |- actions/
-    |-- challenge-progress.ts
-    |-- user-progress.ts
-    |-- user-subscription.ts
-  |- app/
-    |-- (auth)/
-    |-- (main)/
-    |-- (marketing)/
-    |-- admin/
-    |-- api/
-    |-- lesson/
-    |-- apple-icon.png
-    |-- favicon.ico
-    |-- globals.css
-    |-- icon1.png
-    |-- icon2.png
-    |-- layout.tsx
-  |- components/
-    |-- modals/
-    |-- ui/
-    |-- banner.tsx
-    |-- feed-wrapper.tsx
-    |-- mobile-header.tsx
-    |-- mobile-sidebar.tsx
-    |-- promo.tsx
-    |-- quests.tsx
-    |-- sidebar-item.tsx
-    |-- sidebar.tsx
-    |-- sticky-wrapper.tsx
-    |-- user-progress.tsx
-  |- config/
-    |-- index.ts
-  |- db/
-    |-- drizzle.ts
-    |-- queries.ts
-    |-- schema.ts
-  |- lib/
-    |-- admin.ts
-    |-- stripe.ts
-    |-- utils.ts
-  |- public/
-  |- scripts/
-    |-- prod.ts
-  |- store/
-    |-- use-exit-modal.ts
-    |-- use-hearts-modal.ts
-    |-- use-practice-modal.ts
-  |- .env.example
-  |- .env/.env.local
-  |- .gitignore
-  |- .prettierrc.json
-  |- components.json
-  |- constants.ts
-  |- drizzle.config.ts
-  |- environment.d.ts
-  |- eslint.config.mjs
-  |- next.config.ts
-  |- package.json
-  |- pnpm-lock.yaml
-  |- pnpm-workspace.yaml
-  |- postcss.config.js
-  |- proxy.ts
-  |- tailwind.config.ts
-  |- tsconfig.json
-  |- vercel.ts
+├── src/
+│   ├── components/        # 卡片、练习、反馈、阅读与设置组件
+│   ├── data/              # 本地词汇与句子数据
+│   ├── features/          # Reader 等领域特性
+│   ├── learning/          # Session、复习、历史与学习状态
+│   ├── lib/               # 本地存储、语音等基础能力
+│   └── pages/             # Home、LearnSession、My
+├── modules/               # 可复用的词卡、SRS、阅读与句子训练模块
+├── tests/                 # 学习流程与领域行为测试
+├── docs/                  # 架构、设计、实施记录与集成说明
+├── index.html             # Vite 入口
+└── package.json           # 开发、测试与构建脚本
 ```
 
-<!--- FOLDER_STRUCTURE_END --->
+## ◇ 本地数据
 
-<br />
+Lexora 使用浏览器 `localStorage` 保存学习状态，主要包括：
 
-## :toolbox: Getting Started
-
-1. Make sure **Git** and **NodeJS** is installed.
-2. Clone this repository to your local computer.
-3. Create `.env` file in **root** directory.
-4. Contents of `.env`:
-
-```env
-# .env
-
-# disabled next.js telemetry
-NEXT_TELEMETRY_DISABLED=1
-
-# clerk auth keys
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="replace_with_clerk_publishable_key"
-CLERK_SECRET_KEY="replace_with_clerk_secret_key"
-
-# neon db uri
-DATABASE_URL="postgresql://<user>:<password>@<host>:<post>/lexora?sslmode=verify-full"
-
-# stripe api key and webhook
-STRIPE_API_SECRET_KEY="replace_with_stripe_secret_key"
-STRIPE_WEBHOOK_SECRET="replace_with_stripe_webhook_secret"
-
-# public app url
-NEXT_PUBLIC_APP_URL=http://localhost:3100
-
-# clerk admin user id(s) separated by comma (,)
-CLERK_ADMIN_IDS="user_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-# or CLERK_ADMIN_IDS="user_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx, user_xxxxxxxxxxxxxxxxxxxxxx" for multiple admins.
-
+```text
+lexora:word-progress
+lexora:settings
+lexora:daily-plan
+lexora:review-history
+lexora:daily-completion
+lexora:learning-day-history
+lexora:reader-interactions
+lexora:reader-document
 ```
 
-5. Obtain Clerk Authentication Keys
-   1. **Source**: Clerk Dashboard or Settings Page
-   2. **Procedure**:
-      - Log in to your Clerk account.
-      - Navigate to the dashboard or settings page.
-      - Look for the section related to authentication keys.
-      - Copy the `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` provided in that section.
+旧版 `english-garden:*` 数据的兼容迁移仍然保留。清除浏览器站点数据会同时清除本地学习记录，请谨慎操作。
 
-6. Retrieve Neon Database URI
-   1. **Source**: Database Provider (e.g., Neon, PostgreSQL)
-   2. **Procedure**:
-      - Access your database provider's platform or configuration.
-      - Locate the database connection details.
-      - Replace `<user>`, `<password>`, `<host>`, and `<port>` placeholders in the URI with your actual database credentials.
-      - Ensure to include `?sslmode=require` at the end of the URI for SSL mode requirement.
+## ▤ 设计与实施记录
 
-7. Fetch Stripe API Key and Webhook Secret
-   1. **Source**: Stripe Dashboard
-   2. **Procedure**:
-      - Log in to your Stripe account.
-      - Navigate to the dashboard or API settings.
-      - Find the section related to API keys and webhook secrets.
-      - Copy the `STRIPE_API_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`.
+- [UI/UX Refactor V2](docs/LEXORA_UI_UX_REFACTOR_V2.md)
+- [Stage 2 UI/UX 修改方向](docs/LEXORA_STAGE2_UI_UX_MODIFICATION_DIRECTION.md)
+- [Stage 2 实施计划](docs/STAGE2_IMPLEMENTATION_PLAN.md)
+- [Stage 2 实施说明](docs/STAGE2_IMPLEMENTATION_NOTES.md)
+- [架构说明](docs/ARCHITECTURE.md)
+- [集成说明](docs/INTEGRATION.md)
 
-8. Specify Public App URL
-   1. **Procedure**:
-      - Replace `http://localhost:3100` with the URL of your deployed application.
+## ▧ 许可与来源
 
-9. Identify Clerk Admin User IDs
-   1. **Source**: Clerk Dashboard or Settings Page
-   2. **Procedure**:
-      - Log in to your Clerk account.
-      - Navigate to the dashboard or settings page.
-      - Find the section related to admin user IDs.
-      - Copy the user IDs provided, ensuring they are separated by commas and spaces.
+项目代码与上游素材的说明见：
 
-10. Save and Secure:
-    - Save the changes to the `.env` file.
+- [SOURCES.md](SOURCES.md)
+- [LICENSES/UPSTREAM-NOTICE.md](LICENSES/UPSTREAM-NOTICE.md)
+- [docs/LICENSE-NOTES.md](docs/LICENSE-NOTES.md)
+- [LICENSE](LICENSE)
 
-11. Install Project Dependencies using `pnpm install`.
+---
 
-12. Run the Seed Script:
-
-In the same terminal, run the following command to execute the seed script:
-
-```bash
-pnpm run db:push && pnpm run db:prod
-```
-
-This command uses `tsx` to execute the Typescript file (`scripts/prod.ts`) and writes challenges data in database.
-
-13. Verify Data in Database:
-
-Once the script completes, check your database to ensure that the challenges data has been successfully seeded.
-
-14. Start the app with `pnpm dev`, then open `http://localhost:3100`.
-
-### Public preview without credentials
-
-Running `pnpm dev` without Clerk or database credentials opens the public
-homepage in preview mode. Protected pages redirect to `/`, and API routes
-return `503` until authentication is configured. This preview does not create
-fake users and does not bypass protected lesson routes.
-
-To use sign-in, courses, lessons, database Seed scripts, and progress
-persistence, create a local `.env.local` using `.env.example` as the template.
-Never commit `.env.local` or real service keys.
-
-**NOTE:** Please make sure to keep your API keys and configuration values secure and do not expose them publicly.
-
-### :raising_hand: Need Help?
-
-If you run into issues during installation or setup:
-
-- **GitHub Issues** — [Open an issue](https://github.com/Xhwe-x/Lexora/issues/new) for setup and troubleshooting help.
-
-## :camera: Screenshots
-
-![Modern UI/UX](/.github/images/img1.png "Modern UI/UX")
-
-![Quests](/.github/images/img2.png "Quests")
-
-![Shop](/.github/images/img3.png "Shop")
-
-## :gear: Tech Stack
-
-[![React JS](https://skillicons.dev/icons?i=react "React JS")](https://react.dev/ "React JS") [![Next JS](https://skillicons.dev/icons?i=next "Next JS")](https://nextjs.org/ "Next JS") [![Typescript](https://skillicons.dev/icons?i=ts "Typescript")](https://www.typescriptlang.org/ "Typescript") [![Tailwind CSS](https://skillicons.dev/icons?i=tailwind "Tailwind CSS")](https://tailwindcss.com/ "Tailwind CSS") [![Vercel](https://skillicons.dev/icons?i=vercel "Vercel")](https://vercel.app/ "Vercel") [![Postgresql](https://skillicons.dev/icons?i=postgres "Postgresql")](https://www.postgresql.org/ "Postgresql")
-
-## :wrench: Stats
-
-[![Lexora repository stats](/.github/images/stats.svg "Lexora repository stats")](https://github.com/Xhwe-x/Lexora "Lexora repository")
-
-## :raised_hands: Contribute
-
-You might encounter some bugs while using this app. You are more than welcome to contribute. Just submit changes via pull request and I will review them before merging. Make sure you follow community guidelines.
-
-## :gem: Acknowledgements
-
-Useful resources and dependencies used in Lexora. Lexora began from Sanidhya
-Kumar Verma&apos;s MIT-licensed Lingo/Duolingo clone and retains its attribution in
-the repository history and license.
-
-- Special Thanks to Code with Antonio: https://codewithantonio.com/
-- Kenney Assets: https://kenney.nl/
-- Freesound: https://freesound.org/
-- Elevenlabs AI: https://elevenlabs.io/
-- Flagpack: https://flagpack.xyz/
-
-<!--- DEPENDENCIES_START --->
-
-- [@clerk/nextjs](https://www.npmjs.com/package/@clerk/nextjs): ^7.7.6
-- [@neondatabase/serverless](https://www.npmjs.com/package/@neondatabase/serverless): ^1.1.0
-- [@radix-ui/react-avatar](https://www.npmjs.com/package/@radix-ui/react-avatar): ^1.2.6
-- [@radix-ui/react-dialog](https://www.npmjs.com/package/@radix-ui/react-dialog): ^1.1.23
-- [@radix-ui/react-progress](https://www.npmjs.com/package/@radix-ui/react-progress): ^1.1.14
-- [@radix-ui/react-separator](https://www.npmjs.com/package/@radix-ui/react-separator): ^1.1.15
-- [@radix-ui/react-slot](https://www.npmjs.com/package/@radix-ui/react-slot): ^1.3.3
-- [@types/node](https://www.npmjs.com/package/@types/node): ^26.2.0
-- [@types/react](https://www.npmjs.com/package/@types/react): ^19.2.17
-- [@types/react-dom](https://www.npmjs.com/package/@types/react-dom): ^19.2.4
-- [@vercel/config](https://www.npmjs.com/package/@vercel/config): ^0.6.1
-- [autoprefixer](https://www.npmjs.com/package/autoprefixer): ^10.5.0
-- [class-variance-authority](https://www.npmjs.com/package/class-variance-authority): ^0.7.1
-- [clsx](https://www.npmjs.com/package/clsx): ^2.1.0
-- [dotenv](https://www.npmjs.com/package/dotenv): ^17.4.2
-- [drizzle-kit](https://www.npmjs.com/package/drizzle-kit): ^0.31.10
-- [drizzle-orm](https://www.npmjs.com/package/drizzle-orm): ^0.45.2
-- [eslint](https://www.npmjs.com/package/eslint): ^9
-- [eslint-config-next](https://www.npmjs.com/package/eslint-config-next): 16.2.12
-- [eslint-config-prettier](https://www.npmjs.com/package/eslint-config-prettier): ^10.1.8
-- [lucide-react](https://www.npmjs.com/package/lucide-react): ^1.25.0
-- [next](https://www.npmjs.com/package/next): ^16.3.1
-- [pg](https://www.npmjs.com/package/pg): ^8.23.0
-- [postcss](https://www.npmjs.com/package/postcss): ^8
-- [prettier](https://www.npmjs.com/package/prettier): ^3.9.6
-- [prettier-plugin-tailwindcss](https://www.npmjs.com/package/prettier-plugin-tailwindcss): ^0.8.0
-- [ra-data-simple-rest](https://www.npmjs.com/package/ra-data-simple-rest): ^5.15.0
-- [react](https://www.npmjs.com/package/react): ^19.2.8
-- [react-admin](https://www.npmjs.com/package/react-admin): ^5.15.1
-- [react-circular-progressbar](https://www.npmjs.com/package/react-circular-progressbar): ^2.2.0
-- [react-confetti](https://www.npmjs.com/package/react-confetti): ^6.4.0
-- [react-dom](https://www.npmjs.com/package/react-dom): ^19.2.8
-- [react-use](https://www.npmjs.com/package/react-use): ^17.6.1
-- [sonner](https://www.npmjs.com/package/sonner): ^2.0.8
-- [stripe](https://www.npmjs.com/package/stripe): ^22.4.0
-- [tailwind-merge](https://www.npmjs.com/package/tailwind-merge): ^3.6.0
-- [tailwindcss](https://www.npmjs.com/package/tailwindcss): ^3.4.19
-- [tailwindcss-animate](https://www.npmjs.com/package/tailwindcss-animate): ^1.0.7
-- [tsx](https://www.npmjs.com/package/tsx): ^4.23.12
-- [typescript](https://www.npmjs.com/package/typescript): ^6
-- [zustand](https://www.npmjs.com/package/zustand): ^5.0.14
-
-<!--- DEPENDENCIES_END --->
-
-## :coffee: Buy Me a Coffee
-
-[<img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" width="200" />](https://www.buymeacoffee.com/sanidhy "Buy me a Coffee")
-
-## :rocket: Follow Me
-
-[![Follow Me](https://img.shields.io/github/followers/sanidhyy?style=social&label=Follow&maxAge=2592000)](https://github.com/sanidhyy "Follow Me")
-[![Share Lexora](https://img.shields.io/badge/share-Lexora-0f766e)](https://x.com/intent/tweet?text=Check%20out%20Lexora&url=https%3A%2F%2Fgithub.com%2FXhwe-x%2FLexora "Share Lexora")
-
-## :books: Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## :page_with_curl: Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
-## :star: Give A Star
-
-You can also give this repository a star to show more people and they can use this repository.
-
-## :star2: Star History
-
-<a href="https://star-history.com/#Xhwe-x/Lexora&Timeline">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Xhwe-x/Lexora&type=Timeline&theme=dark" />
-  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Xhwe-x/Lexora&type=Timeline" />
-  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Xhwe-x/Lexora&type=Timeline" />
-</picture>
-</a>
-
-<br />
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+**Lexora** · Learn words in context. Keep the streak gentle.<br>
+Made for small, consistent progress.
