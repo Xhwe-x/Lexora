@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, Check, ChevronDown, ChevronUp, RotateCcw, X } from 'lucide-react'
 import type { Word } from '../../features/words/types'
 import type { SessionItem } from '../../learning/types'
@@ -23,9 +23,12 @@ export function ExerciseFeedback({ result, word, submittedAnswer, item, onContin
   onContinue: () => void
 }) {
   const [expanded, setExpanded] = useState(false)
+  const continueRef = useRef<HTMLButtonElement>(null)
   const wrong = result === 'wrong'
   const hint = wrong && item.exerciseType === 'typing' ? differenceHint(submittedAnswer ?? '', word.en) : ''
   const retryMessage = item.source === 'retry' && item.attempt >= 2 ? '系统会在后续复习再次安排这个词' : '稍后会再次练到这个词'
+
+  useEffect(() => { continueRef.current?.focus() }, [item.id, result])
 
   return <section className={`feedbackDock ${result}`} role="status" aria-live="polite">
     <div className="feedbackDockMain">
@@ -42,11 +45,11 @@ export function ExerciseFeedback({ result, word, submittedAnswer, item, onContin
           <p className="retryPromise"><RotateCcw size={15}/>{retryMessage}</p>
         </>}
       </div>
-      <button className="primaryButton feedbackContinue" onClick={onContinue}>继续 <ArrowRight size={17}/></button>
+      <button ref={continueRef} className="primaryButton feedbackContinue" type="button" aria-keyshortcuts="Enter" onClick={onContinue} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); onContinue() } }}>继续 · Enter <ArrowRight size={17}/></button>
     </div>
     {wrong && <div className="feedbackExplain">
       <button type="button" className="feedbackExplainToggle" onClick={() => setExpanded(value => !value)} aria-expanded={expanded}>为什么？ {expanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</button>
-      {expanded && <div className="feedbackExplainBody"><div><b>{word.en}</b><span>{word.level} · {word.category}</span></div><p>{word.zh}</p><blockquote>{word.example}<span>{word.exampleZh}</span></blockquote></div>}
+      {expanded && <div className="feedbackExplainBody"><div><b>{word.en}</b><span>{word.level} · {word.category}{word.meanings?.[0]?.partOfSpeech ? ` · ${word.meanings[0].partOfSpeech}` : ''}</span></div><p>{word.zh}</p>{word.meanings?.[0]?.usageNote && <p className="feedbackUsage">{word.meanings[0].usageNote}</p>}{word.collocations?.length ? <p className="feedbackUsage">常见搭配：{word.collocations.slice(0, 2).join(' · ')}</p> : null}<blockquote>{word.example}<span>{word.exampleZh}</span></blockquote></div>}
     </div>}
   </section>
 }

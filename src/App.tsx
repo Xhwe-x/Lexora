@@ -35,7 +35,7 @@ const DEFAULT_PLACEMENT_RATIOS = { dailyRatio: 60, examRatio: 40 }
 type SettingsState = { dailyCount: number }
 type DailyPlan = { date: string; count: number; wordIds: string[] }
 type DailyCompletion = { date: string; completed: boolean }
-type SessionState = { mode: 'daily' } | { mode: 'review'; wordIds?: string[] } | null
+type SessionState = { mode: 'daily' } | { mode: 'review'; wordIds?: string[] } | { mode: 'placement' } | null
 
 function buildDailyPlan(date: string, count: number, progress: Record<string, WordProgress>, previousIds: string[] = [], priorityIds: string[] = [], placementProfile: Pick<PlacementProfile, 'dailyRatio' | 'examRatio'> | null = null): DailyPlan {
   const validPrevious = previousIds.filter(id => words.some(word => word.id === id)).slice(0, count)
@@ -153,6 +153,10 @@ export default function App() {
     setSession({ mode: 'review', wordIds: validIds?.length ? validIds : undefined })
   }
 
+  const startDaily = () => {
+    setSession(placementProfile ? { mode: 'daily' } : { mode: 'placement' })
+  }
+
   const completePlacement = (profile: PlacementProfile) => {
     const date = todayKey()
     const plan = buildDailyPlan(date, dailyCount, progress, [], readerPriorityIds, profile)
@@ -160,6 +164,7 @@ export default function App() {
     saveJson(PLACEMENT_PROFILE_KEY, profile)
     setDailyPlan(plan)
     saveJson(DAILY_PLAN_KEY, plan)
+    setSession({ mode: 'daily' })
     setPage('home')
   }
 
@@ -169,7 +174,7 @@ export default function App() {
     location.reload()
   }
 
-  if (!placementProfile) return <PlacementOnboarding questions={PLACEMENT_QUESTIONS} onComplete={completePlacement}/>
+  if (session?.mode === 'placement') return <PlacementOnboarding questions={PLACEMENT_QUESTIONS} onComplete={completePlacement} onExit={() => setSession(null)}/>
 
   if (session) return <LearnSession
     mode={session.mode}
@@ -182,10 +187,10 @@ export default function App() {
   />
 
   return <div className="appShell"><Sidebar page={page} onChange={setPage} placementProfile={placementProfile}/><main className="mainArea">
-    {page === 'home' && <Home dueCount={dueWords.length} newWords={dailyWords} progress={progress} completedToday={completedToday} placementProfile={placementProfile} onStart={() => setSession({ mode: 'daily' })} onReview={() => dueWords.length > 0 ? startReview(dueWords.map(word => word.id)) : setPage('review')} onWords={() => setPage('words')} onSettings={() => setPage('my')}/>}
+    {page === 'home' && <Home dueCount={dueWords.length} newWords={dailyWords} progress={progress} completedToday={completedToday} placementProfile={placementProfile} onStart={startDaily} onReview={() => dueWords.length > 0 ? startReview(dueWords.map(word => word.id)) : setPage('review')} onWords={() => setPage('words')} onSettings={() => setPage('my')}/>}
     {page === 'words' && <div className="pageStack pageEnter"><div className="pageHeading"><div><span className="eyebrow">VOCABULARY</span><h1>单词库</h1><p>浏览词汇和当前学习状态；真正的记忆验证放在 Learn Session 里。</p></div></div><div className="wordGrid">{words.map(word => <WordCard key={word.id} word={word} progress={progress[word.id]}/>)}</div></div>}
     {page === 'review' && <Review allWords={words} progress={progress} history={reviewHistory} dueWords={dueWords} readerInteractions={readerInteractions} onStart={startReview} onGoReader={() => setPage('reader')} onGoWords={() => setPage('words')}/>}
-    {page === 'reader' && <Reader allWords={words} progress={progress} interactions={readerInteractions} onInteraction={saveReaderInteraction} onSaveWord={saveReaderWord}/>}
-    {page === 'my' && <My allWords={words} progress={progress} reviewHistory={reviewHistory} learningHistory={learningHistory} dailyCount={dailyCount} maxDaily={words.length} onCount={updateDailyCount} onReset={resetAll} onStartToday={() => setSession({ mode: 'daily' })} onGoReader={() => setPage('reader')}/>}
+    {page === 'reader' && <Reader allWords={words} progress={progress} interactions={readerInteractions} onInteraction={saveReaderInteraction} onSaveWord={saveReaderWord} onGoReview={() => setPage('review')}/>}
+    {page === 'my' && <My allWords={words} progress={progress} reviewHistory={reviewHistory} learningHistory={learningHistory} dailyCount={dailyCount} maxDaily={words.length} onCount={updateDailyCount} onReset={resetAll} onStartToday={startDaily} onGoReader={() => setPage('reader')}/>}
   </main></div>
 }

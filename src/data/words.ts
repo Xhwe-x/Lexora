@@ -1,9 +1,47 @@
-import type { Word } from '../features/words/types'
+import type { Word, WordContent } from '../features/words/types'
 
 function initialTrack(level: string, category: string) {
   if (level === 'B1' || category === '学习') return 'exam'
   if (category === '日常' || category === '交流' || category === '动作') return 'daily'
   return 'shared'
+}
+
+const a2Content: Record<string, WordContent> = {
+  ability: { meanings: [{ text: '能力', partOfSpeech: '名词', usageNote: '表示做某事的能力' }], collocations: ['ability to do sth', 'improve your ability'], examExample: "The course develops students' ability to solve problems.", examExampleZh: '这门课程培养学生解决问题的能力。' },
+  accept: { meanings: [{ text: '接受；同意', partOfSpeech: '动词', usageNote: '接受建议、邀请或结果' }, { text: '认可；接纳' }], collocations: ['accept an invitation', 'accept a suggestion'], examExample: 'The school may accept late applications.', examExampleZh: '学校可能会接受迟交的申请。' },
+  advice: { meanings: [{ text: '建议；忠告', partOfSpeech: '名词', usageNote: 'advice 通常不可数' }], collocations: ['give advice', 'ask for advice'], examExample: 'The report offers advice for new learners.', examExampleZh: '这份报告为新学习者提供建议。' },
+  afraid: { meanings: [{ text: '害怕的；担心的', partOfSpeech: '形容词', usageNote: 'be afraid to do sth / be afraid of sth' }], collocations: ['be afraid to do sth', 'be afraid of sth'], examExample: 'Students should not be afraid to ask questions.', examExampleZh: '学生不应该害怕提问。' },
+  agree: { meanings: [{ text: '同意；赞成', partOfSpeech: '动词', usageNote: 'agree with 人或观点，agree to 计划' }], collocations: ['agree with an idea', 'agree to a plan'], examExample: 'Most participants agree with the main idea.', examExampleZh: '大多数参与者都同意主要观点。' },
+  believe: { meanings: [{ text: '相信；认为', partOfSpeech: '动词', usageNote: 'believe that 后接完整观点' }], collocations: ['believe in sth', 'believe that...'], examExample: 'Researchers believe that practice matters.', examExampleZh: '研究者认为练习很重要。' },
+  borrow: { meanings: [{ text: '借入；借用', partOfSpeech: '动词', usageNote: '从某人或某处借来，反义词是 lend' }], collocations: ['borrow sth from sb', 'borrow a book'], examExample: 'Students can borrow books from the library.', examExampleZh: '学生可以从图书馆借书。' },
+  build: { meanings: [{ text: '建造；建立', partOfSpeech: '动词', usageNote: '也可表示逐步形成能力、信心或习惯' }], collocations: ['build confidence', 'build a habit'], examExample: 'Daily practice builds a strong foundation.', examExampleZh: '日常练习能打下坚实基础。' },
+  choose: { meanings: [{ text: '选择；挑选', partOfSpeech: '动词', usageNote: 'choose between/from 表示在选项中选择' }], collocations: ['choose between A and B', 'choose the best answer'], examExample: 'Choose the best answer from the options.', examExampleZh: '从选项中选择最佳答案。' },
+  clear: { meanings: [{ text: '清楚的；明确的', partOfSpeech: '形容词', usageNote: 'clear explanation 表示容易理解' }, { text: '清除；清理' }], collocations: ['clear explanation', 'make a goal clear'], examExample: 'The writer gives a clear definition.', examExampleZh: '作者给出了清晰的定义。' },
+  common: { meanings: [{ text: '常见的；普通的', partOfSpeech: '形容词', usageNote: '描述经常出现的人、事物或表达' }], collocations: ['common problem', 'common phrase'], examExample: 'This is a common pattern in academic writing.', examExampleZh: '这是学术写作中常见的模式。' },
+  continue: { meanings: [{ text: '继续；持续', partOfSpeech: '动词', usageNote: 'continue doing/to do 都可表示继续' }], collocations: ['continue doing sth', 'continue to learn'], examExample: 'The study will continue for two years.', examExampleZh: '这项研究将持续两年。' },
+  decide: { meanings: [{ text: '决定；下定决心', partOfSpeech: '动词', usageNote: 'decide to do sth 表示决定做某事' }], collocations: ['decide to do sth', 'make a decision'], examExample: 'The committee decided to change the plan.', examExampleZh: '委员会决定改变计划。' },
+  during: { meanings: [{ text: '在……期间', partOfSpeech: '介词', usageNote: '后接名词或名词短语，不直接接完整句子' }], collocations: ['during the week', 'during the test'], examExample: 'No phones are allowed during the test.', examExampleZh: '考试期间不允许使用手机。' },
+  enough: { meanings: [{ text: '足够的；足够地', partOfSpeech: '限定词 / 副词', usageNote: 'enough time；good enough' }], collocations: ['enough time', 'good enough'], examExample: 'The evidence is strong enough to support the claim.', examExampleZh: '证据足够有力，可以支持这一论点。' },
+  explain: { meanings: [{ text: '解释；说明', partOfSpeech: '动词', usageNote: 'explain sth to sb，不说 explain sb sth' }], collocations: ['explain sth to sb', 'explain how...'], examExample: 'The diagram explains how the system works.', examExampleZh: '图表解释了系统如何运作。' },
+  follow: { meanings: [{ text: '跟随；遵循', partOfSpeech: '动词', usageNote: '既可表示跟随某人，也可表示遵循步骤或建议' }], collocations: ['follow instructions', 'follow a plan'], examExample: 'Follow the steps in the experiment.', examExampleZh: '遵循实验中的步骤。' },
+  friendly: { meanings: [{ text: '友好的；亲切的', partOfSpeech: '形容词', usageNote: '描述人的态度或环境' }], collocations: ['friendly to sb', 'friendly service'], examExample: 'The guide uses a friendly but clear tone.', examExampleZh: '这份指南使用了友好而清晰的语气。' },
+  future: { meanings: [{ text: '未来；将来', partOfSpeech: '名词 / 形容词', usageNote: 'in the future；future plans' }], collocations: ['in the future', 'future plans'], examExample: 'The report considers future changes.', examExampleZh: '这份报告考虑了未来的变化。' },
+  happen: { meanings: [{ text: '发生', partOfSpeech: '动词', usageNote: '描述事件发生；what happened 常用于询问经过' }], collocations: ['what happened', 'happen to do sth'], examExample: 'The change happened after the test.', examExampleZh: '变化发生在测试之后。' },
+  improve: { meanings: [{ text: '提高；改善', partOfSpeech: '动词', usageNote: '使能力、表现或状态变得更好' }, { text: '改进；改良' }], collocations: ['improve your skills', 'improve performance'], examExample: 'Regular review can improve reading speed.', examExampleZh: '定期复习可以提高阅读速度。' },
+  instead: { meanings: [{ text: '代替；反而', partOfSpeech: '副词 / 介词短语', usageNote: 'instead of 后接名词或动名词' }], collocations: ['instead of doing sth', 'do sth instead'], examExample: 'The study uses interviews instead of surveys.', examExampleZh: '这项研究使用访谈而不是问卷。' },
+  invite: { meanings: [{ text: '邀请', partOfSpeech: '动词', usageNote: 'invite sb to do sth 或 invite sb to a place' }], collocations: ['invite sb to dinner', 'invite sb to do sth'], examExample: 'The organizers invited experts to speak.', examExampleZh: '组织者邀请专家发言。' },
+  join: { meanings: [{ text: '加入；参加', partOfSpeech: '动词', usageNote: '加入团体、活动或讨论' }], collocations: ['join a group', 'join a discussion'], examExample: 'Students may join the discussion.', examExampleZh: '学生可以参加讨论。' },
+  meaning: { meanings: [{ text: '意思；含义', partOfSpeech: '名词', usageNote: 'the meaning of sth 表示某事物的含义' }], collocations: ['the meaning of sth', 'a clear meaning'], examExample: 'Context often changes the meaning of a word.', examExampleZh: '语境常常会改变一个词的含义。' },
+  notice: { meanings: [{ text: '注意到；留意', partOfSpeech: '动词', usageNote: 'notice 后可接名词、从句或 doing' }], collocations: ['notice a change', 'notice how...'], examExample: 'Readers should notice the change in tone.', examExampleZh: '读者应该注意语气的变化。' },
+  prepare: { meanings: [{ text: '准备；预备', partOfSpeech: '动词', usageNote: 'prepare for sth；prepare sth' }], collocations: ['prepare for a test', 'prepare a report'], examExample: 'Prepare for the test by reviewing key terms.', examExampleZh: '通过复习关键词来准备考试。' },
+  quickly: { meanings: [{ text: '快速地；很快', partOfSpeech: '副词', usageNote: '修饰动作或变化的速度' }], collocations: ['move quickly', 'change quickly'], examExample: 'The number quickly increased.', examExampleZh: '数量很快增加了。' },
+  remember: { meanings: [{ text: '记住；想起', partOfSpeech: '动词', usageNote: 'remember to do 尚未做；remember doing 已经做过' }], collocations: ['remember to do sth', 'remember a name'], examExample: 'Remember to check the source.', examExampleZh: '记得检查来源。' },
+  review: { meanings: [{ text: '复习；审查', partOfSpeech: '动词 / 名词', usageNote: 'review lessons，也可表示对文章或研究进行评述' }], collocations: ['review a lesson', 'review recent research'], examExample: 'The paper reviews recent research.', examExampleZh: '这篇论文回顾了近期研究。' },
+  spend: { meanings: [{ text: '花费（时间 / 钱）', partOfSpeech: '动词', usageNote: 'spend time/money on sth 或 spend time doing sth' }], collocations: ['spend time doing sth', 'spend money on sth'], examExample: 'The project spends more time on practice.', examExampleZh: '这个项目把更多时间用于练习。' },
+  understand: { meanings: [{ text: '理解；明白', partOfSpeech: '动词', usageNote: '理解信息、观点或原因' }], collocations: ['understand the idea', 'understand why...'], examExample: 'Readers must understand the main argument.', examExampleZh: '读者必须理解主要论点。' },
+  useful: { meanings: [{ text: '有用的；实用的', partOfSpeech: '形容词', usageNote: 'useful for/to 表示对某事有帮助' }], collocations: ['useful for learning', 'useful information'], examExample: 'The chart is useful for comparing results.', examExampleZh: '这张图表有助于比较结果。' },
+  usually: { meanings: [{ text: '通常；一般', partOfSpeech: '副词', usageNote: '描述通常发生的习惯或情况' }], collocations: ['usually do sth', 'usually available'], examExample: 'The process usually takes less time.', examExampleZh: '这个过程通常花费更少时间。' },
+  wonder: { meanings: [{ text: '想知道；感到好奇', partOfSpeech: '动词', usageNote: 'wonder whether/why/how 引出想知道的内容' }], collocations: ['wonder why...', 'wonder whether...'], examExample: 'Researchers wonder why the pattern changed.', examExampleZh: '研究者想知道模式为何发生了变化。' }
 }
 
 export const words: Word[] = [
@@ -83,4 +121,17 @@ export const words: Word[] = [
   ['wonder','wonder','想知道','I wonder what this means.','我想知道这是什么意思。','A2','交流'],
   ['write','write','写','Write one sentence with the new word.','用新单词写一个句子。','A1','学习'],
   ['wrong','wrong','错误的','There is nothing wrong with trying again.','再试一次没有什么错。','A1','描述']
-].map(([id,en,zh,example,exampleZh,level,category]) => ({ id,en,zh,example,exampleZh,level,category,track: initialTrack(level, category) })) as Word[]
+].map(([id,en,zh,example,exampleZh,level,category]) => {
+  const content = level === 'A2' ? a2Content[id] : undefined
+  return {
+    id,
+    en,
+    zh,
+    example,
+    exampleZh,
+    level,
+    category,
+    track: initialTrack(level, category),
+    ...(content ? { ...content, dailyExample: content.dailyExample ?? example, dailyExampleZh: content.dailyExampleZh ?? exampleZh } : {})
+  }
+}) as Word[]

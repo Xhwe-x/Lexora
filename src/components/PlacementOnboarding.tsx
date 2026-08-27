@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { ArrowRight, CheckCircle2, CircleHelp, Target } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowRight, CheckCircle2, CircleHelp, Target, X } from 'lucide-react'
 import {
   getPlacementBand,
   getPlacementQuestions,
@@ -34,9 +34,10 @@ function goalLabel(goal: PlacementGoal) {
   return goalOptions.find(option => option.id === goal)?.label ?? '两者都要'
 }
 
-export function PlacementOnboarding({ questions = getPlacementQuestions(), onComplete }: {
+export function PlacementOnboarding({ questions = getPlacementQuestions(), onComplete, onExit }: {
   questions?: PlacementQuestion[]
   onComplete: (profile: PlacementProfile) => void
+  onExit?: () => void
 }) {
   const [stage, setStage] = useState<'goal' | 'assessment' | 'result'>('goal')
   const [goal, setGoal] = useState<PlacementGoal>('both')
@@ -45,10 +46,30 @@ export function PlacementOnboarding({ questions = getPlacementQuestions(), onCom
   const [answers, setAnswers] = useState<Record<string, PlacementAnswer>>({})
   const [profile, setProfile] = useState<PlacementProfile | null>(null)
   const questionStartedAt = useRef(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const firstChoiceRef = useRef<HTMLButtonElement>(null)
+  const continueButtonRef = useRef<HTMLButtonElement>(null)
 
   const currentQuestion = questions[questionIndex]
   const submittedAnswer = currentQuestion ? answers[currentQuestion.id] : undefined
   const progress = questions.length ? ((questionIndex + 1) / questions.length) * 100 : 0
+
+  useEffect(() => {
+    if (stage === 'result') {
+      continueButtonRef.current?.focus()
+      return
+    }
+    if (stage !== 'assessment' || !currentQuestion) return
+    if (submittedAnswer) {
+      continueButtonRef.current?.focus()
+      return
+    }
+    if (currentQuestion.options.length) {
+      firstChoiceRef.current?.focus()
+      return
+    }
+    if (window.matchMedia('(min-width: 621px)').matches) inputRef.current?.focus()
+  }, [currentQuestion, stage, submittedAnswer, questionIndex])
 
   const startAssessment = () => {
     setAnswers({})
@@ -97,7 +118,7 @@ export function PlacementOnboarding({ questions = getPlacementQuestions(), onCom
     const weakestSkill = getWeakestSkill(profile.skillScores)
     return <main className="placementShell">
       <div className="placementFrame placementResultFrame">
-        <div className="placementBrand"><span className="placementBrandMark">L</span><span>Lexora</span></div>
+        <div className="placementTopBar"><div className="placementBrand"><span className="placementBrandMark">L</span><span>Lexora</span></div>{onExit && <button className="placementExitButton" type="button" onClick={onExit} aria-label="退出起点测评"><X size={18}/><span>退出测评</span></button>}</div>
         <section className="placementCard placementResultCard" aria-labelledby="placement-result-title">
           <div className="placementResultIcon"><CheckCircle2 size={25}/></div>
           <span className="placementEyebrow">你的学习起点</span>
@@ -110,7 +131,7 @@ export function PlacementOnboarding({ questions = getPlacementQuestions(), onCom
             <div><span>学习比例</span><strong>日常 {profile.dailyRatio}% · 考试 {profile.examRatio}%</strong></div>
             <div><span>最需要巩固</span><strong>{getSkillLabel(weakestSkill)}</strong></div>
           </div>
-          <button className="primaryButton placementStartButton" type="button" onClick={() => onComplete(profile)}>开始学习 <ArrowRight size={18}/></button>
+          <button ref={continueButtonRef} className="primaryButton placementStartButton" type="button" aria-keyshortcuts="Enter" onClick={() => onComplete(profile)}>继续今日学习 · Enter <ArrowRight size={18}/></button>
           <p className="placementFinePrint">这是根据本次短测给出的起始推荐，之后可以再调整学习比例，不代表 CEFR 认证。</p>
         </section>
       </div>
@@ -121,7 +142,7 @@ export function PlacementOnboarding({ questions = getPlacementQuestions(), onCom
     return <main className="placementShell">
       <div className="placementFrame placementAssessmentFrame">
         <header className="placementAssessmentHeader">
-          <div className="placementBrand"><span className="placementBrandMark">L</span><span>Lexora</span></div>
+          <div className="placementAssessmentBrand"><div className="placementBrand"><span className="placementBrandMark">L</span><span>Lexora</span></div>{onExit && <button className="placementExitButton" type="button" onClick={onExit} aria-label="退出起点测评"><X size={18}/><span>退出测评</span></button>}</div>
           <div className="placementProgressInfo">
             <div><span>A2 起点测评</span><strong>{questionIndex + 1} / {questions.length}</strong></div>
             <div className="placementProgress" aria-hidden="true"><span style={{ width: `${progress}%` }}/></div>
@@ -129,15 +150,15 @@ export function PlacementOnboarding({ questions = getPlacementQuestions(), onCom
         </header>
         <section className="placementCard placementQuestionCard" aria-labelledby="placement-question-title">
           <div className="placementQuestionMeta"><span className="placementSkillPill"><CircleHelp size={14}/>{getSkillLabel(currentQuestion.skill)}</span><span>{currentQuestion.level} · {currentQuestion.track === 'shared' ? '共同能力' : currentQuestion.track === 'daily' ? '日常场景' : '考试场景'}</span></div>
-          <h1 id="placement-question-title">{currentQuestion.prompt}</h1>
+          {currentQuestion.skill === 'context' ? <div className="placementContextQuestion"><p className="placementQuestionInstruction">选择最适合当前句子的表达</p><h1 id="placement-question-title">{currentQuestion.prompt}</h1>{currentQuestion.contextHint && <p className="placementContextHint">语境提示：{currentQuestion.contextHint}</p>}</div> : <h1 id="placement-question-title">{currentQuestion.prompt}</h1>}
           <form onSubmit={event => { event.preventDefault(); submitAnswer() }}>
             {currentQuestion.options.length ? <div className="placementChoiceGrid" role="group" aria-label="测评选项">
-              {currentQuestion.options.map((option, index) => <button key={option} className={`placementChoice ${draftAnswer === option ? 'selected' : ''}`} type="button" aria-pressed={draftAnswer === option} disabled={Boolean(submittedAnswer)} onClick={() => setDraftAnswer(option)}><span>{String.fromCharCode(65 + index)}</span>{option}</button>)}
-            </div> : <label className="placementInputLabel" htmlFor="placement-answer"><span>请输入英文答案</span><input id="placement-answer" className="placementInput" value={draftAnswer} disabled={Boolean(submittedAnswer)} autoComplete="off" autoCapitalize="none" spellCheck={false} onChange={event => setDraftAnswer(event.target.value)} /></label>}
+              {currentQuestion.options.map((option, index) => <button key={option} ref={index === 0 ? firstChoiceRef : undefined} className={`placementChoice ${draftAnswer === option ? 'selected' : ''}`} type="button" aria-pressed={draftAnswer === option} disabled={Boolean(submittedAnswer)} onClick={() => setDraftAnswer(option)} onKeyDown={event => { if (event.key === 'Enter' && draftAnswer === option && !submittedAnswer) { event.preventDefault(); submitAnswer() } }}><span>{String.fromCharCode(65 + index)}</span>{option}</button>)}
+            </div> : <label className="placementInputLabel" htmlFor="placement-answer"><span>请输入英文答案</span><input ref={inputRef} id="placement-answer" className="placementInput" value={draftAnswer} disabled={Boolean(submittedAnswer)} autoComplete="off" autoCapitalize="none" spellCheck={false} onChange={event => setDraftAnswer(event.target.value)} onKeyDown={event => { if (event.key !== 'Enter') return; event.preventDefault(); if (draftAnswer.trim() && !submittedAnswer) submitAnswer() }} /></label>}
             {submittedAnswer && <p className="placementRecorded" aria-live="polite"><CheckCircle2 size={17}/> 答案已记录，继续完成剩余题目。</p>}
             <div className="placementQuestionActions">
               {!submittedAnswer && <button className="ghostButton" type="button" disabled={questionIndex === 0} onClick={goToPreviousQuestion}>上一题</button>}
-              {!submittedAnswer ? <button className="primaryButton" type="submit" disabled={!draftAnswer.trim()}>确认答案 <ArrowRight size={17}/></button> : <button className="primaryButton" type="button" onClick={goToNextQuestion}>{questionIndex === questions.length - 1 ? '查看结果' : '下一题'} <ArrowRight size={17}/></button>}
+              {!submittedAnswer ? <button className="primaryButton" type="submit" aria-keyshortcuts="Enter" disabled={!draftAnswer.trim()}>确认答案 · Enter <ArrowRight size={17}/></button> : <button ref={continueButtonRef} className="primaryButton" type="button" aria-keyshortcuts="Enter" onClick={goToNextQuestion}>{questionIndex === questions.length - 1 ? '查看结果' : '下一题'} · Enter <ArrowRight size={17}/></button>}
             </div>
           </form>
         </section>
@@ -148,7 +169,7 @@ export function PlacementOnboarding({ questions = getPlacementQuestions(), onCom
 
   return <main className="placementShell">
     <div className="placementFrame placementGoalFrame">
-      <div className="placementBrand"><span className="placementBrandMark">L</span><span>Lexora</span></div>
+      <div className="placementTopBar"><div className="placementBrand"><span className="placementBrandMark">L</span><span>Lexora</span></div>{onExit && <button className="placementExitButton" type="button" onClick={onExit} aria-label="退出起点测评"><X size={18}/><span>退出测评</span></button>}</div>
       <section className="placementCard placementGoalCard" aria-labelledby="placement-goal-title">
         <span className="placementEyebrow">WELCOME TO LEXORA</span>
         <h1 id="placement-goal-title">先选一个想去的方向。</h1>

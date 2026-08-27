@@ -1,5 +1,5 @@
 import { ArrowRight, Check, RotateCcw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ChoiceExercise } from '../components/exercise/ChoiceExercise'
 import { ExerciseShell } from '../components/exercise/ExerciseShell'
 import { IntroExercise } from '../components/exercise/IntroExercise'
@@ -78,7 +78,11 @@ export function LearnSession({ mode, allWords, dueWords, newWords, onExit, onCom
   const choose = (value: string) => {
     if (!word || feedback) return
     setSelected(value)
-    judge(value === word.en)
+  }
+
+  const submitChoice = () => {
+    if (!word || !selected || feedback) return
+    judge(selected === word.en)
   }
 
   const submitTyping = () => {
@@ -104,18 +108,6 @@ export function LearnSession({ mode, allWords, dueWords, newWords, onExit, onCom
     resetAnswerState()
   }
 
-  useEffect(() => {
-    if (!feedback) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        event.preventDefault()
-        advance(feedback === 'right')
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [feedback, current, queue, step])
-
   if (finished || !current || !word) return <ExerciseShell completed={coreTotal} total={coreTotal} onExit={onExit}>
     <section className="sessionSummary exerciseCard">
       <div className="summaryIcon"><Check size={28}/></div>
@@ -137,7 +129,7 @@ export function LearnSession({ mode, allWords, dueWords, newWords, onExit, onCom
   return <ExerciseShell completed={completedCore} total={coreTotal} onExit={requestExit}>
     <div className={`exerciseWithFeedback ${feedback ? 'hasFeedback' : ''}`}>
       {current.exerciseType === 'intro' && <IntroExercise word={word} onContinue={() => advance()}/>}
-      {current.exerciseType === 'choice' && <ChoiceExercise word={word} options={options} selected={selected} disabled={Boolean(feedback)} onSelect={choose}/>}
+      {current.exerciseType === 'choice' && <ChoiceExercise word={word} options={options} selected={selected} disabled={Boolean(feedback)} onSelect={choose} onSubmit={submitChoice}/>}
       {current.exerciseType === 'typing' && <TypingExercise word={word} value={answer} disabled={Boolean(feedback)} onChange={setAnswer} onSubmit={submitTyping}/>}
       {feedback && <ExerciseFeedback result={feedback} word={word} submittedAnswer={submittedAnswer} item={current} onContinue={() => advance(feedback === 'right')}/>}
     </div>

@@ -17,6 +17,7 @@ export type ReaderDocument = {
 export type ReaderWordInteraction = {
   token: string
   wordId?: string
+  documentId?: string
   contextSentence: string
   lookedUpAt: string
   savedToVocabulary: boolean
