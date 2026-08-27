@@ -760,6 +760,13 @@ html, body { background: var(--page); color: var(--ink); }
 .placementQuestionInstruction { margin: 29px 0 0; color: var(--ink-muted); font-size: 13px; font-weight: 700; }
 .placementContextQuestion h1 { margin: 12px auto 18px; font-size: clamp(31px, 5.5vw, 48px); letter-spacing: -.5px; }
 .placementContextHint { max-width: 560px; margin: 0 auto 28px; padding: 10px 13px; border-left: 3px solid var(--tide); background: var(--tide-soft); color: var(--tide); font-size: 13px; line-height: 1.6; text-align: left; }
+.placementAnswerFeedback { margin-top: 20px; padding: 13px 15px; border: 1px solid var(--line); border-left: 3px solid var(--primary); border-radius: var(--radius-md); background: #f1f8f3; color: var(--ink); text-align: left; }
+.placementAnswerFeedback.incorrect { border-color: #e0c7b5; border-left-color: var(--amber); background: var(--amber-soft); }
+.placementAnswerFeedback strong { display: block; color: var(--primary); font-size: 13px; }
+.placementAnswerFeedback.incorrect strong { color: var(--amber); }
+.placementAnswerFeedback p { margin: 8px 0 4px; font-family: Georgia, serif; font-size: 15px; line-height: 1.55; }
+.placementAnswerFeedback span, .placementAnswerFeedback small { display: block; color: var(--ink-muted); font-size: 11px; line-height: 1.55; }
+.placementAnswerFeedback small { margin-top: 5px; color: #896b37; }
 .placementQuestionActions .primaryButton { min-width: 170px; }
 .typingHint { margin: -9px auto 18px; color: var(--ink-muted); font-size: 12px; }
 .readerToolbar .eyebrow { color: var(--tide); }
@@ -776,6 +783,12 @@ html, body { background: var(--page); color: var(--ink); }
 .studyCollocations { margin: -12px 0 22px; color: #4d6256; font-size: 12px; line-height: 1.55; }
 .studyCollocations span { margin-right: 7px; color: var(--ink-muted); font-weight: 800; }
 .feedbackUsage { margin: 6px 0 !important; color: var(--ink-muted); font-size: 12px; }
+.wordMeanings, .inspectorMoreMeanings, .feedbackMeanings { margin: 0 0 13px; border-top: 1px solid var(--line); padding-top: 10px; color: var(--ink-muted); font-size: 11px; }
+.wordMeanings summary, .inspectorMoreMeanings summary, .feedbackMeanings summary { cursor: pointer; color: var(--primary); font-weight: 700; }
+.wordMeanings ol, .inspectorMoreMeanings ol, .feedbackMeanings ol { margin: 9px 0 0; padding-left: 19px; }
+.wordMeanings li, .inspectorMoreMeanings li, .feedbackMeanings li { padding: 3px 0; color: var(--ink); line-height: 1.5; }
+.wordMeanings li span, .inspectorMoreMeanings li span { margin-left: 6px; color: var(--ink-muted); }
+.wordMeanings li small, .inspectorMoreMeanings li small, .feedbackMeanings li small { display: block; color: var(--ink-muted); line-height: 1.45; }
 .wordMoreContext, .inspectorMoreContext { margin-top: 13px; border-top: 1px solid var(--line); padding-top: 11px; color: var(--ink-muted); font-size: 11px; }
 .wordMoreContext summary, .inspectorMoreContext summary { cursor: pointer; color: var(--primary); font-weight: 700; }
 .wordMoreContext p, .inspectorMoreContext p { margin: 9px 0 3px; color: var(--ink); line-height: 1.5; }
@@ -864,11 +877,17 @@ html, body { background: var(--page); color: var(--ink); }
 .readerCompletionActions button { min-height: 38px; padding: 8px 11px; font-size: 11px; white-space: nowrap; }
 .readerEditorTitle { display: flex; align-items: center; gap: 12px; padding: 15px 24px 0; color: var(--ink-muted); font-size: 12px; }
 .readerEditorTitle input { min-width: 0; flex: 1; height: 38px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 0 10px; color: var(--ink); }
+.readerFilterBar { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.readerCompletionPrompt { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 16px 19px; border: 1px solid #b9d6d8; border-left: 3px solid var(--tide); border-radius: var(--radius-lg); background: var(--tide-soft); }
+.readerCompletionPrompt p { margin: 6px 0 0; color: var(--ink-muted); font-size: 12px; line-height: 1.6; }
+.readerCompletionPrompt .primaryButton { min-height: 39px; padding: 8px 13px; white-space: nowrap; }
+.readerCompletionStats strong { white-space: nowrap; }
 
 @media (max-width: 900px) {
   .readerToolbar { grid-template-columns: 1fr auto; }
   .readerToolbarProgress { grid-column: 1 / -1; grid-row: 2; }
   .readerTools { grid-column: 1 / -1; justify-content: flex-start; }
+  .readerFilterBar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .readerCompletion { grid-template-columns: auto minmax(0, 1fr); }
   .readerCompletionStats, .readerCompletionActions { grid-column: 1 / -1; }
 }
@@ -881,6 +900,8 @@ html, body { background: var(--page); color: var(--ink); }
   .readerContinueCard > button { grid-column: 1 / -1; width: 100%; }
   .readerContentGrid { grid-template-columns: 1fr; }
   .readerFilterBar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .readerCompletionPrompt { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px; }
+  .readerCompletionPrompt .primaryButton { width: 100%; }
   .readerCustomEntry { align-items: flex-start; flex-direction: column; padding: 17px 16px; }
   .readerCustomActions { width: 100%; justify-content: space-between; }
   .readerToolbar { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }

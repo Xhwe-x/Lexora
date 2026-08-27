@@ -13,6 +13,8 @@ export type PlacementQuestion = {
   skill: PlacementSkill
   prompt: string
   contextHint?: string
+  feedback?: string
+  explanation?: string
   options: string[]
   answer: string
   wordId: string

@@ -5,12 +5,17 @@ import {
   filterReaderContents,
   getCurrentReaderSentence,
   getReaderContent,
+  getReaderMinutesBucket,
   getReaderSentences,
   getReaderStats,
-  readerContents
+  readerContents,
+  readerKindLabel,
+  type ReaderFilters,
+  type ReaderKind
 } from '../../src/features/reader/catalog.ts'
 import {
   makeReaderDocument,
+  updateReaderProgress,
   upsertReaderInteraction,
   type ReaderWordInteraction
 } from '../../src/features/reader/state.ts'
@@ -18,7 +23,7 @@ import {
 const allowedLevels = ['A1', 'A2', 'B1', 'custom']
 const allowedTracks = ['daily', 'exam', 'shared']
 const allowedTopics = ['生活', '工作', '旅行', '学习', '观点', '自定义']
-const allowedKinds = ['article', 'dialogue', 'email', 'story']
+const allowedKinds = ['article', 'dialogue', 'email', 'story', 'news', 'audio-transcript']
 
 test('reader catalog has enough classified content and defaults to A2', () => {
   assert.ok(readerContents.length >= 4)
@@ -46,6 +51,40 @@ test('filterReaderContents applies level, track, topic and kind filters', () => 
   assert.ok(byTopic.every(content => content.topic === '工作'))
   assert.ok(byKind.length > 0)
   assert.ok(byKind.every(content => content.kind === 'email'))
+})
+
+type ReaderMinutes = 'all' | 'short' | 'medium' | 'long'
+type ReaderFiltersWithMinutes = ReaderFilters & { minutes: ReaderMinutes }
+
+function minutesFilter(minutes: ReaderMinutes): ReaderFiltersWithMinutes {
+  return { level: 'all', track: 'all', topic: 'all', kind: 'all', minutes }
+}
+
+test('reader minute buckets use explicit 1-5, 6-10 and 11-plus minute ranges', () => {
+  const expectedBuckets = [
+    { minutes: 1, bucket: 'short' },
+    { minutes: 5, bucket: 'short' },
+    { minutes: 10, bucket: 'medium' },
+    { minutes: 11, bucket: 'long' }
+  ] as const
+
+  for (const scenario of expectedBuckets) {
+    assert.equal(getReaderMinutesBucket(scenario.minutes), scenario.bucket)
+  }
+
+  const fixtures = readerContents.slice(0, 4).map((content, index) => ({
+    ...content,
+    id: `minutes-fixture-${index}`,
+    estimatedMinutes: [1, 5, 10, 11][index]
+  }))
+  assert.deepEqual(filterReaderContents(fixtures, minutesFilter('short')).map(content => content.estimatedMinutes), [1, 5])
+  assert.deepEqual(filterReaderContents(fixtures, minutesFilter('medium')).map(content => content.estimatedMinutes), [10])
+  assert.deepEqual(filterReaderContents(fixtures, minutesFilter('long')).map(content => content.estimatedMinutes), [11])
+})
+
+test('reader kind labels cover news and audio transcripts', () => {
+  assert.equal(readerKindLabel('news' as unknown as ReaderKind), '新闻')
+  assert.equal(readerKindLabel('audio-transcript' as unknown as ReaderKind), '音频文本')
 })
 
 test('getReaderContent recognizes built-in documents and preserves custom document metadata', () => {
@@ -102,6 +141,24 @@ test('getReaderStats isolates document interactions and keeps legacy context mat
   ])
 
   assert.deepEqual(stats, { encounteredCount: 3, savedCount: 2 })
+})
+
+test('completed reader summary keeps 100 percent progress, estimated duration and interaction stats', () => {
+  const content = readerContents[0]
+  const document = updateReaderProgress(makeReaderDocument(content.text, content.title), 100)
+  const stats = getReaderStats(document, [
+    interaction({ token: 'ability', documentId: document.id, contextSentence: 'Current document has ability.' }),
+    interaction({ token: 'saved', documentId: document.id, contextSentence: 'Current document has ability.', savedToVocabulary: true })
+  ])
+  const custom = getReaderContent(makeReaderDocument('One short sentence.', 'One minute note'))
+
+  assert.equal(document.scrollProgress, 100)
+  assert.ok(content.estimatedMinutes > 0)
+  assert.equal(custom.estimatedMinutes, 1)
+  assert.deepEqual(
+    { progress: document.scrollProgress, estimatedMinutes: content.estimatedMinutes, ...stats },
+    { progress: 100, estimatedMinutes: content.estimatedMinutes, encounteredCount: 2, savedCount: 1 }
+  )
 })
 
 test('upsertReaderInteraction preserves a previous savedToVocabulary value', () => {

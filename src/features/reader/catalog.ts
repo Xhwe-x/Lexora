@@ -5,8 +5,9 @@ import type { ReaderDocument, ReaderWordInteraction } from './state'
 export type ReaderLevel = 'A1' | 'A2' | 'B1' | 'custom'
 export type ReaderTrack = 'daily' | 'exam' | 'shared'
 export type ReaderTopic = '生活' | '工作' | '旅行' | '学习' | '观点' | '自定义'
-export type ReaderKind = 'article' | 'dialogue' | 'email' | 'story'
+export type ReaderKind = 'article' | 'dialogue' | 'email' | 'story' | 'news' | 'audio-transcript'
 export type ReaderSource = 'built-in' | 'custom'
+export type ReaderMinutes = 'all' | 'short' | 'medium' | 'long'
 
 export type ReaderContent = {
   id: string
@@ -27,9 +28,10 @@ export type ReaderFilters = {
   track: 'all' | ReaderTrack
   topic: 'all' | ReaderTopic
   kind: 'all' | ReaderKind
+  minutes: ReaderMinutes
 }
 
-export const defaultReaderFilters: ReaderFilters = { level: 'all', track: 'all', topic: 'all', kind: 'all' }
+export const defaultReaderFilters: ReaderFilters = { level: 'all', track: 'all', topic: 'all', kind: 'all', minutes: 'all' }
 
 function estimateMinutes(text: string) {
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length
@@ -39,6 +41,8 @@ function estimateMinutes(text: string) {
 const dailyDialogue = `A good morning does not have to be perfect. I open the window, drink some water, and write down one thing I want to finish. If I have time, I walk to the station instead of taking the bus. This small routine helps me start the day with a clear mind.`
 const workEmail = `Hi Maya,\n\nThank you for your advice about the new project. I agree that we should start with a simple plan and review it each Friday. Could you explain which task is most important this week? I will prepare a short update and send it before our meeting.\n\nBest,\nLena`
 const sharedIdeas = `People often believe that learning needs a lot of free time, but a useful habit can be much smaller. You can read one page, notice one new expression, and try to use it in a sentence. During a busy week, this simple plan is enough to continue. The important part is to choose a clear goal and remember why it matters.`
+const localNews = `A small community library opened a quiet study room this week. The room has simple desks, clear signs, and a place for people to share useful books. Visitors can use it during the day, and students say the new space helps them continue their work.`
+const audioTranscript = `Welcome to the travel desk. If you are visiting the city for the first time, choose a short walk near the river. You can ask for a map, check the bus times, and stop at a small cafe. Please remember to keep your ticket until you leave.`
 
 export const readerContents: ReaderContent[] = [
   {
@@ -92,6 +96,32 @@ export const readerContents: ReaderContent[] = [
     description: '用短文理解如何把学习目标拆成可以重复的小步骤。',
     skills: ['理解主旨', '连接观点'],
     source: 'built-in'
+  },
+  {
+    id: 'community-study-news',
+    title: 'A New Study Room',
+    text: localNews,
+    level: 'A2',
+    track: 'shared',
+    topic: '观点',
+    kind: 'news',
+    estimatedMinutes: estimateMinutes(localNews),
+    description: '用一则简短本地新闻理解公共空间与学习安排。',
+    skills: ['抓住事实', '理解因果'],
+    source: 'built-in'
+  },
+  {
+    id: 'travel-desk-transcript',
+    title: 'At the Travel Desk',
+    text: audioTranscript,
+    level: 'A2',
+    track: 'daily',
+    topic: '旅行',
+    kind: 'audio-transcript',
+    estimatedMinutes: estimateMinutes(audioTranscript),
+    description: '把一段可读的旅行服务文本当作听力前的阅读准备。',
+    skills: ['识别指令', '理解顺序'],
+    source: 'built-in'
   }
 ]
 
@@ -116,12 +146,20 @@ export function getReaderContent(document: ReaderDocument): ReaderContent {
 }
 
 export function filterReaderContents(contents: ReaderContent[], filters: ReaderFilters) {
+  const minutes = filters.minutes ?? 'all'
   return contents.filter(content => (
     (filters.level === 'all' || content.level === filters.level)
     && (filters.track === 'all' || content.track === filters.track)
     && (filters.topic === 'all' || content.topic === filters.topic)
     && (filters.kind === 'all' || content.kind === filters.kind)
+    && (minutes === 'all' || getReaderMinutesBucket(content.estimatedMinutes) === minutes)
   ))
+}
+
+export function getReaderMinutesBucket(minutes: number): Exclude<ReaderMinutes, 'all'> {
+  if (minutes <= 5) return 'short'
+  if (minutes <= 10) return 'medium'
+  return 'long'
 }
 
 export function getReaderSentences(text: string) {
@@ -135,8 +173,19 @@ export function getCurrentReaderSentence(text: string, progress: number) {
   return sentences[index]
 }
 
+export function getReaderCompletionProgress(scrollHeight: number, clientHeight: number, currentProgress: number) {
+  const progress = Number.isFinite(currentProgress) ? Math.max(0, Math.min(100, Math.round(currentProgress))) : 0
+  const hasMeasuredLayout = Number.isFinite(scrollHeight) && Number.isFinite(clientHeight) && scrollHeight > 0 && clientHeight > 0
+  if (hasMeasuredLayout && scrollHeight <= clientHeight) return progress >= 100 ? 100 : 0
+  return progress
+}
+
+export function getReaderDocumentInteractions(document: ReaderDocument, interactions: ReaderWordInteraction[]) {
+  return interactions.filter(item => item.documentId === document.id || (!item.documentId && Boolean(item.contextSentence && document.text.includes(item.contextSentence))))
+}
+
 export function getReaderStats(document: ReaderDocument, interactions: ReaderWordInteraction[]) {
-  const documentInteractions = interactions.filter(item => item.documentId === document.id || (!item.documentId && Boolean(item.contextSentence && document.text.includes(item.contextSentence))))
+  const documentInteractions = getReaderDocumentInteractions(document, interactions)
   return {
     encounteredCount: new Set(documentInteractions.map(item => item.token)).size,
     savedCount: new Set(documentInteractions.filter(item => item.savedToVocabulary).map(item => item.token)).size
@@ -152,5 +201,5 @@ export function readerLevelLabel(level: ReaderLevel) {
 }
 
 export function readerKindLabel(kind: ReaderKind) {
-  return kind === 'dialogue' ? '对话' : kind === 'email' ? '邮件' : kind === 'story' ? '故事' : '短文'
+  return kind === 'dialogue' ? '对话' : kind === 'email' ? '邮件' : kind === 'story' ? '故事' : kind === 'news' ? '新闻' : kind === 'audio-transcript' ? '音频文本' : '短文'
 }

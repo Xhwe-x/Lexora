@@ -153,6 +153,12 @@ export default function App() {
     setSession({ mode: 'review', wordIds: validIds?.length ? validIds : undefined })
   }
 
+  const openReaderReview = (wordIds?: string[]) => {
+    const validIds = wordIds?.filter(id => words.some(word => word.id === id))
+    if (validIds?.length) startReview(validIds)
+    else setPage('review')
+  }
+
   const startDaily = () => {
     setSession(placementProfile ? { mode: 'daily' } : { mode: 'placement' })
   }
@@ -190,7 +196,7 @@ export default function App() {
     {page === 'home' && <Home dueCount={dueWords.length} newWords={dailyWords} progress={progress} completedToday={completedToday} placementProfile={placementProfile} onStart={startDaily} onReview={() => dueWords.length > 0 ? startReview(dueWords.map(word => word.id)) : setPage('review')} onWords={() => setPage('words')} onSettings={() => setPage('my')}/>}
     {page === 'words' && <div className="pageStack pageEnter"><div className="pageHeading"><div><span className="eyebrow">VOCABULARY</span><h1>单词库</h1><p>浏览词汇和当前学习状态；真正的记忆验证放在 Learn Session 里。</p></div></div><div className="wordGrid">{words.map(word => <WordCard key={word.id} word={word} progress={progress[word.id]}/>)}</div></div>}
     {page === 'review' && <Review allWords={words} progress={progress} history={reviewHistory} dueWords={dueWords} readerInteractions={readerInteractions} onStart={startReview} onGoReader={() => setPage('reader')} onGoWords={() => setPage('words')}/>}
-    {page === 'reader' && <Reader allWords={words} progress={progress} interactions={readerInteractions} onInteraction={saveReaderInteraction} onSaveWord={saveReaderWord} onGoReview={() => setPage('review')}/>}
+    {page === 'reader' && <Reader allWords={words} progress={progress} interactions={readerInteractions} onInteraction={saveReaderInteraction} onSaveWord={saveReaderWord} onGoReview={openReaderReview}/>}
     {page === 'my' && <My allWords={words} progress={progress} reviewHistory={reviewHistory} learningHistory={learningHistory} dailyCount={dailyCount} maxDaily={words.length} onCount={updateDailyCount} onReset={resetAll} onStartToday={startDaily} onGoReader={() => setPage('reader')}/>}
   </main></div>
 }

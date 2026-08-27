@@ -42,6 +42,8 @@ function contextQuestion(id: string, options: string[], track: PlacementTrack): 
     skill: 'context',
     prompt: blankExample(id),
     contextHint: word.exampleZh,
+    feedback: word.example,
+    explanation: word.exampleZh,
     options,
     answer: word.en,
     wordId: word.id,
