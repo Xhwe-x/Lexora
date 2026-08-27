@@ -4,6 +4,7 @@ import { Settings } from '../components/Settings'
 import type { Word, WordProgress } from '../features/words/types'
 import { calculateStreak, getWeekActivity, type LearningDayRecord } from '../learning/learningHistory'
 import type { ReviewEvent } from '../learning/reviewHistory'
+import type { SyncState } from '../features/sync/client'
 
 const DAY_LABELS = ['一', '二', '三', '四', '五', '六', '日']
 
@@ -28,7 +29,7 @@ function formatDate(date?: string) {
   return new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`))
 }
 
-export function My({ allWords, progress, reviewHistory, learningHistory, dailyCount, maxDaily, onCount, onReset, onStartToday, onGoReader }: {
+export function My({ allWords, progress, reviewHistory, learningHistory, dailyCount, maxDaily, onCount, onReset, onStartToday, onGoReader, syncSnapshot, onSyncDownload }: {
   allWords: Word[]
   progress: Record<string, WordProgress>
   reviewHistory: ReviewEvent[]
@@ -39,6 +40,8 @@ export function My({ allWords, progress, reviewHistory, learningHistory, dailyCo
   onReset: () => void
   onStartToday: () => void
   onGoReader: () => void
+  syncSnapshot?: SyncState
+  onSyncDownload?: (state: SyncState) => void
 }) {
   const week = useMemo(() => getWeekActivity(learningHistory), [learningHistory])
   const [selectedDay, setSelectedDay] = useState(() => week.find(day => day.active)?.date ?? week[0]?.date)
@@ -83,7 +86,7 @@ export function My({ allWords, progress, reviewHistory, learningHistory, dailyCo
 
     {milestones.length > 0 && <section className="mySection milestones"><div className="sectionHeading"><div><span className="eyebrow">MILESTONES</span><h2>最近里程碑</h2></div></div><div className="milestoneList">{milestones.slice(-3).reverse().map(item => <div className="milestoneRow" key={item.title}><span className="milestoneIcon"><Sparkles size={17}/></span><div><strong>{item.title}</strong><span>{formatDate(item.date)} 达成</span></div></div>)}</div></section>}
 
-    <Settings dailyCount={dailyCount} max={maxDaily} onCount={onCount} onReset={onReset}/>
+    <Settings dailyCount={dailyCount} max={maxDaily} onCount={onCount} onReset={onReset} syncSnapshot={syncSnapshot} onSyncDownload={onSyncDownload}/>
   </div>
 }
 

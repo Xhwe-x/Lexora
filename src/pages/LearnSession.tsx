@@ -1,5 +1,5 @@
 import { ArrowRight, Check, RotateCcw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ChoiceExercise } from '../components/exercise/ChoiceExercise'
 import { ExerciseShell } from '../components/exercise/ExerciseShell'
 import { IntroExercise } from '../components/exercise/IntroExercise'
@@ -43,6 +43,13 @@ export function LearnSession({ mode, allWords, dueWords, newWords, onExit, onCom
   const options = useMemo(() => word ? createChoiceOptions(word, allWords) : [], [word, allWords])
   const summary = useMemo(() => summarizeSessionResults(results), [results])
   const weakWords = useMemo(() => summary.weakWordIds.map(id => allWords.find(wordItem => wordItem.id === id)).filter((item): item is Word => Boolean(item)), [summary.weakWordIds, allWords])
+
+  useEffect(() => {
+    if (queue.length !== 0 || completionNotified) return
+    onComplete?.()
+    setCompletionNotified(true)
+    setFinished(true)
+  }, [completionNotified, onComplete, queue.length])
 
   const resetAnswerState = () => { setAnswer(''); setSelected(undefined); setFeedback(undefined) }
 
@@ -108,7 +115,7 @@ export function LearnSession({ mode, allWords, dueWords, newWords, onExit, onCom
     resetAnswerState()
   }
 
-  if (finished || !current || !word) return <ExerciseShell completed={coreTotal} total={coreTotal} onExit={onExit}>
+  if (finished || (!current && queue.length === 0) || (!word && current)) return <ExerciseShell completed={coreTotal} total={coreTotal} onExit={onExit}>
     <section className="sessionSummary exerciseCard">
       <div className="summaryIcon"><Check size={28}/></div>
       <span className="exerciseKicker">SESSION COMPLETE</span>
@@ -122,6 +129,19 @@ export function LearnSession({ mode, allWords, dueWords, newWords, onExit, onCom
       {weakWords.length > 0 && <div className="summaryWeak"><span>需要再留意</span><p>{weakWords.slice(0, 5).map(item => item.en).join(' · ')}</p></div>}
       <div className="summaryActions"><button className="primaryButton sessionPrimary" onClick={onExit}>返回今日 <ArrowRight size={18}/></button>{weakWords.length > 0 && <button className="textButton summaryRetry" onClick={retryWeakWords}><RotateCcw size={16}/> 再练错词</button>}</div>
     </section>
+  </ExerciseShell>
+
+  if (!current) return <ExerciseShell completed={completedCore} total={coreTotal} onExit={requestExit}>
+    <section className="sessionWaiting exerciseCard" aria-live="polite">
+      <span className="exerciseKicker">稍后再练</span>
+      <h1>下一步正在准备。</h1>
+      <p>这组内容已经完成，错词会在合适的步骤再次出现。</p>
+      <button className="primaryButton sessionPrimary" type="button" onClick={() => { setStep(value => value + 1); setLastWordId(undefined) }}>继续 · Enter <ArrowRight size={18}/></button>
+    </section>
+  </ExerciseShell>
+
+  if (!word) return <ExerciseShell completed={completedCore} total={coreTotal} onExit={requestExit}>
+    <section className="sessionWaiting exerciseCard" aria-live="polite"><span className="exerciseKicker">内容不可用</span><h1>这组内容已更新。</h1><p>当前词条暂时无法加载，请返回后重新开始。</p><button className="primaryButton sessionPrimary" type="button" onClick={onExit}>返回今日 <ArrowRight size={18}/></button></section>
   </ExerciseShell>
 
   const submittedAnswer = current.exerciseType === 'choice' ? selected : current.exerciseType === 'typing' ? answer : undefined

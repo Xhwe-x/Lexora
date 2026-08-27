@@ -33,7 +33,7 @@ export function Home({ dueCount, newWords, progress, completedToday, placementPr
       <div className="todayFocusTop"><span className="brandEyebrow">LEXORA · TODAY</span>{hasCompletedToday ? <span className="donePill"><CheckCircle2 size={15}/> 今日目标已完成</span> : <span className="quietPill"><Clock3 size={15}/> 约 {estimate} 分钟</span>}</div>
       <div className="todayFocusBody">
         <p className="greeting">{!placementProfile ? '欢迎来到 Lexora' : hasCompletedToday ? '做得不错，今天的核心任务已经收尾。' : '今天先完成这一组。'}</p>
-        <h1>{!placementProfile ? '开始第一组 A2 学习。' : hasCompletedToday ? '保持节奏，比多刷几轮更重要。' : '复习旧词，再把新词真正想起来。'}</h1>
+        <h1>{!placementProfile ? '开始第一组 A2 学习。' : hasCompletedToday ? '下一步：明天继续主路径。' : '现在这一步：完成今天的核心任务。'}</h1>
         <div className="todaySummary" aria-label="今日学习任务"><span><RotateCcw size={17}/><b>{dueCount}</b> 到期复习</span><span><Sparkles size={17}/><b>{newWords.length}</b> 今日新词</span><span><Clock3 size={17}/><b>{estimate}</b> 分钟左右</span></div>
         {!hasCompletedToday ? <button className="primaryButton homePrimary" onClick={onStart}>{placementProfile ? '开始今日学习' : '开始第一次学习'} <ArrowRight size={19}/></button> : <button className="secondaryButton homePrimary secondaryHome" onClick={onReview}>自由复习 <ArrowRight size={19}/></button>}
       </div>

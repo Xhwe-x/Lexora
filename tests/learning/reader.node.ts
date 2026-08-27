@@ -105,6 +105,12 @@ test('getReaderContent recognizes built-in documents and preserves custom docume
   assert.equal(custom.text, customText)
 })
 
+test('getReaderContent does not cast an unknown custom examId into a valid exam route', () => {
+  const document = { ...makeReaderDocument('A custom exam note.', 'Custom exam note'), examId: 'not-a-route' }
+  const content = getReaderContent(document)
+  assert.equal(content.examId, undefined)
+})
+
 test('reader sentence helpers handle short text, punctuation and 0/100 progress', () => {
   const text = 'Short text, okay. Are you ready? Go!'
   assert.deepEqual(getReaderSentences(text), ['Short text, okay.', 'Are you ready?', 'Go!'])

@@ -1,6 +1,9 @@
 // @ts-ignore Node's native strip-types runner requires the explicit extension here.
 import { readingText } from './data.ts'
-import type { ReaderDocument, ReaderWordInteraction } from './state'
+import type { ReaderCue, ReaderDocument, ReaderWordInteraction } from './state'
+export type { ReaderCue } from './state'
+// @ts-ignore Node's native strip-types runner requires the explicit extension here.
+import { getExamRoute, type ExamRouteId } from '../exams/routes.ts'
 
 export type ReaderLevel = 'A1' | 'A2' | 'B1' | 'custom'
 export type ReaderTrack = 'daily' | 'exam' | 'shared'
@@ -21,6 +24,9 @@ export type ReaderContent = {
   description: string
   skills: string[]
   source: ReaderSource
+  examId?: ExamRouteId
+  audioUrl?: string
+  cues?: ReaderCue[]
 }
 
 export type ReaderFilters = {
@@ -43,6 +49,11 @@ const workEmail = `Hi Maya,\n\nThank you for your advice about the new project. 
 const sharedIdeas = `People often believe that learning needs a lot of free time, but a useful habit can be much smaller. You can read one page, notice one new expression, and try to use it in a sentence. During a busy week, this simple plan is enough to continue. The important part is to choose a clear goal and remember why it matters.`
 const localNews = `A small community library opened a quiet study room this week. The room has simple desks, clear signs, and a place for people to share useful books. Visitors can use it during the day, and students say the new space helps them continue their work.`
 const audioTranscript = `Welcome to the travel desk. If you are visiting the city for the first time, choose a short walk near the river. You can ask for a map, check the bus times, and stop at a small cafe. Please remember to keep your ticket until you leave.`
+const generalExamText = `A clear plan helps learners make steady progress. Review the main idea, notice useful details, and choose one difficult point to practise again. Small steps can build confidence before a longer test.`
+const cet4Text = `Many students prepare for an English test by reviewing common phrases. It is useful to read the sentence first, understand the context, and then check the exact meaning of a new word.`
+const cet6Text = `A strong argument needs a clear structure. The writer should explain the main idea, give an example, and connect each point to the question. This process helps readers follow a more difficult text.`
+const kaoyanText = `Reading a long passage takes more than knowing every word. Good readers notice the writer's purpose, compare different ideas, and return to the evidence before they choose an answer.`
+const ieltsText = `A useful answer gives a clear opinion and supports it with a simple example. When a question is difficult, take a moment to understand the task before you continue.`
 
 export const readerContents: ReaderContent[] = [
   {
@@ -122,6 +133,76 @@ export const readerContents: ReaderContent[] = [
     description: '把一段可读的旅行服务文本当作听力前的阅读准备。',
     skills: ['识别指令', '理解顺序'],
     source: 'built-in'
+  },
+  {
+    id: 'exam-general-starter',
+    title: 'A Clear Test Plan',
+    text: generalExamText,
+    level: 'A2',
+    track: 'exam',
+    topic: '学习',
+    kind: 'article',
+    estimatedMinutes: estimateMinutes(generalExamText),
+    description: '通用考试英语的 A2 起点：先理解主旨，再安排复习。',
+    skills: ['理解主旨', '定位细节'],
+    source: 'built-in',
+    examId: 'general'
+  },
+  {
+    id: 'exam-cet4-starter',
+    title: 'Reviewing Common Phrases',
+    text: cet4Text,
+    level: 'A2',
+    track: 'exam',
+    topic: '学习',
+    kind: 'article',
+    estimatedMinutes: estimateMinutes(cet4Text),
+    description: 'CET-4 A2 起始内容：从常见短语和语境理解开始。',
+    skills: ['理解语境', '复习短语'],
+    source: 'built-in',
+    examId: 'cet4'
+  },
+  {
+    id: 'exam-cet6-starter',
+    title: 'The Shape of an Argument',
+    text: cet6Text,
+    level: 'B1',
+    track: 'exam',
+    topic: '观点',
+    kind: 'article',
+    estimatedMinutes: estimateMinutes(cet6Text),
+    description: 'CET-6 B1 起始内容：练习结构、例子与观点连接。',
+    skills: ['理解结构', '连接观点'],
+    source: 'built-in',
+    examId: 'cet6'
+  },
+  {
+    id: 'exam-kaoyan-starter',
+    title: 'Reading for Evidence',
+    text: kaoyanText,
+    level: 'B1',
+    track: 'exam',
+    topic: '观点',
+    kind: 'news',
+    estimatedMinutes: estimateMinutes(kaoyanText),
+    description: '考研英语 B1 起始内容：围绕目的、证据和选项阅读。',
+    skills: ['识别目的', '寻找证据'],
+    source: 'built-in',
+    examId: 'kaoyan'
+  },
+  {
+    id: 'exam-ielts-starter',
+    title: 'A Useful Answer',
+    text: ieltsText,
+    level: 'A2',
+    track: 'exam',
+    topic: '观点',
+    kind: 'dialogue',
+    estimatedMinutes: estimateMinutes(ieltsText),
+    description: 'IELTS A2 起始内容：先回应任务，再用例子支持观点。',
+    skills: ['理解任务', '表达观点'],
+    source: 'built-in',
+    examId: 'ielts'
   }
 ]
 
@@ -141,7 +222,10 @@ export function getReaderContent(document: ReaderDocument): ReaderContent {
     estimatedMinutes: estimateMinutes(document.text),
     description: '这是你自己的阅读文本。Lexora 只保存文本与阅读进度。',
     skills: [],
-    source: 'custom'
+    source: 'custom',
+    audioUrl: document.audioUrl,
+    cues: document.cues,
+    examId: getExamRoute(document.examId)?.id as ExamRouteId | undefined
   }
 }
 

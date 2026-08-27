@@ -67,7 +67,7 @@ export function selectNextItem(queue: SessionItem[], currentStep: number, lastWo
   const differentWord = eligible.find(item => item.wordId !== lastWordId)
   if (differentWord) return differentWord
   if (eligible.length > 0) return eligible[0]
-  return queue.length > 0 ? queue.reduce((best, item) => item.earliestStep < best.earliestStep ? item : best) : undefined
+  return undefined
 }
 
 export function coreProgress(items: SessionItem[], completedIds: Set<string>) {

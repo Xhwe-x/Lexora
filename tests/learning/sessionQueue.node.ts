@@ -73,3 +73,18 @@ test('retry items never increase the core progress denominator', async () => {
   const withRetry = mod.enqueueRetry!(base, failed, 3)
   assert.equal(mod.coreProgress!(withRetry, new Set()).total, originalTotal)
 })
+
+test('selectNextItem does not return a retry before its earliestStep', async () => {
+  const mod = await loadModule()
+  assert.equal(typeof mod.selectNextItem, 'function', 'selectNextItem should exist')
+  const retry = { id: 'retry-before-ready', wordId: 'ability', exerciseType: 'typing', source: 'retry', attempt: 1, earliestStep: 5, core: false } as const
+  assert.equal(mod.selectNextItem!([retry], 4), undefined)
+})
+
+test('empty daily sessions report a complete zero-item core progress state', async () => {
+  const mod = await loadModule()
+  assert.equal(typeof mod.coreProgress, 'function', 'coreProgress should exist')
+  const progress = mod.coreProgress!([], new Set())
+  assert.deepEqual(progress, { completed: 0, total: 0 })
+  assert.equal(progress.completed, progress.total)
+})

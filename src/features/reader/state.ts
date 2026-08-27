@@ -5,6 +5,15 @@ export type ReaderSettings = {
   font: 'serif' | 'sans'
 }
 
+export type ReaderCue = {
+  id: string
+  startMs: number
+  endMs: number
+  text: string
+}
+
+export type ReaderImportFormat = 'plain-text' | 'html' | 'srt' | 'vtt' | 'url'
+
 export type ReaderDocument = {
   id: string
   title: string
@@ -12,6 +21,13 @@ export type ReaderDocument = {
   updatedAt: string
   scrollProgress: number
   settings: ReaderSettings
+  source?: 'built-in' | 'custom' | 'imported'
+  format?: ReaderImportFormat
+  cues?: ReaderCue[]
+  audioUrl?: string
+  audioProgress?: number
+  audioTimeMs?: number
+  examId?: string
 }
 
 export type ReaderWordInteraction = {

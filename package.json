@@ -7,10 +7,12 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
+    "sync:server": "node server/index.mjs",
     "test": "vitest run",
     "test:modules": "node --test \"modules/*/tests/*.test.mjs\"",
-    "verify": "npm run test:domain && npm run test:modules && npm test && npm run build",
-    "test:domain": "node --experimental-strip-types --test tests/learning/*.node.ts"
+    "verify": "npm run test:domain && npm run test:server && npm run test:modules && npm test && npm run build",
+    "test:domain": "node --experimental-strip-types --test tests/learning/*.node.ts",
+    "test:server": "node --test \"tests/server/*.mjs\""
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

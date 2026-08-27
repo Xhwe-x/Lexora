@@ -2,14 +2,23 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSPropert
 import { BookOpen, Check, ChevronDown, Minus, Plus, X } from 'lucide-react'
 import type { Word, WordProgress } from '../features/words/types'
 import { defaultReaderContent, getCurrentReaderSentence, getReaderCompletionProgress, getReaderContent, getReaderDocumentInteractions, getReaderStats, readerContents, type ReaderContent } from '../features/reader/catalog'
-import { getContextSentence, makeReaderDocument, normalizeReaderToken, updateReaderProgress, type ReaderDocument, type ReaderWordInteraction } from '../features/reader/state'
+import { getContextSentence, makeReaderDocument, normalizeReaderToken, updateReaderProgress, type ReaderCue, type ReaderDocument, type ReaderWordInteraction } from '../features/reader/state'
+import { getExamRouteLabel } from '../features/exams/routes'
+import { getActiveCue } from '../features/reader/audioSync'
+import { createArticleReviewPack, isArticleReviewPack, type ArticleReviewPack } from '../features/reader/reviewPack'
+import type { ReaderImportResult } from '../features/reader/importers'
 import { loadJson, saveJson } from '../lib/storage'
 import { SpeechButton } from './audio/SpeechButton'
+import { ArticleReviewPack as ArticleReviewPackView } from './reader/ArticleReviewPack'
+import { ReaderAudioControls } from './reader/ReaderAudioControls'
 import { ReaderCompletion } from './reader/ReaderCompletion'
+import { ReaderImportDialog } from './reader/ReaderImportDialog'
 import { ReaderLibrary } from './reader/ReaderLibrary'
 import { ReaderToolbar } from './reader/ReaderToolbar'
 
 const READER_DOCUMENT_KEY = 'lexora:reader-document'
+const READER_REVIEW_PACK_KEY = 'lexora:reader-review-pack'
+const readerServiceUrl = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_LEXORA_SERVICE_URL
 
 function nextFontSize(value: number, delta: number) { return Math.max(18, Math.min(22, value + delta)) }
 function widthPx(width: ReaderDocument['settings']['width']) { return width === 'narrow' ? 620 : width === 'wide' ? 760 : 690 }
@@ -25,6 +34,12 @@ export function Reader({ allWords, progress, interactions, onInteraction, onSave
 }) {
   const [document, setDocument] = useState<ReaderDocument>(() => loadJson(READER_DOCUMENT_KEY, makeReaderDocument(defaultReaderContent.text, defaultReaderContent.title)))
   const [view, setView] = useState<'library' | 'reading'>('library')
+  const [importOpen, setImportOpen] = useState(false)
+  const [reviewPack, setReviewPack] = useState<ArticleReviewPack | null>(() => {
+    const stored = loadJson<unknown>(READER_REVIEW_PACK_KEY, null)
+    if (!isArticleReviewPack(stored)) return null
+    return stored.contentId === getReaderContent(document).id ? stored : null
+  })
   const [editorOpen, setEditorOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [draft, setDraft] = useState(document.text)
@@ -36,20 +51,25 @@ export function Reader({ allWords, progress, interactions, onInteraction, onSave
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null)
   const sheetDragStart = useRef<number | null>(null)
   const editorTriggerRef = useRef<HTMLButtonElement>(null)
+  const importTriggerRef = useRef<HTMLButtonElement>(null)
   const readingStartedAtRef = useRef<number | null>(null)
   const [sheetDrag, setSheetDrag] = useState(0)
   const [canvasSize, setCanvasSize] = useState({ scrollHeight: 0, clientHeight: 0 })
   const [elapsedSeconds, setElapsedSeconds] = useState<number | undefined>()
+  const [activeAudioCue, setActiveAudioCue] = useState<ReaderCue | undefined>()
+  const [audioProgress, setAudioProgress] = useState<number | undefined>(() => document.audioProgress)
+  const [audioTimeMs, setAudioTimeMs] = useState<number>(() => document.audioTimeMs ?? 0)
 
   const normalizedSelected = normalizeReaderToken(selectedToken)
   const selectedWord = useMemo(() => allWords.find(word => word.en.toLowerCase() === normalizedSelected), [allWords, normalizedSelected])
   const selectedInteraction = [...interactions].reverse().find(item => item.token === normalizedSelected && item.contextSentence === selectedContext)
   const isSaved = Boolean(selectedInteraction?.savedToVocabulary || (selectedWord && progress[selectedWord.id] && progress[selectedWord.id].status !== 'new'))
-  const parts = useMemo(() => document.text.split(/(\b[A-Za-z][A-Za-z'-]*\b)/g), [document.text])
   const currentContent = useMemo(() => getReaderContent(document), [document])
-  const currentSentence = useMemo(() => selectedContext || getCurrentReaderSentence(document.text, document.scrollProgress), [document.text, document.scrollProgress, selectedContext])
-  const readerStats = useMemo(() => getReaderStats(document, interactions), [document, interactions])
   const completionProgress = getReaderCompletionProgress(canvasSize.scrollHeight, canvasSize.clientHeight, document.scrollProgress)
+  const audioEnabled = Boolean(currentContent.audioUrl)
+  const readerProgress = audioEnabled ? audioProgress ?? 0 : completionProgress
+  const currentSentence = useMemo(() => activeAudioCue?.text || selectedContext || getCurrentReaderSentence(document.text, document.scrollProgress), [activeAudioCue, document.text, document.scrollProgress, selectedContext])
+  const readerStats = useMemo(() => getReaderStats(document, interactions), [document, interactions])
   const currentSavedWordIds = useMemo(() => Array.from(new Set(getReaderDocumentInteractions(document, interactions).filter(item => item.savedToVocabulary && item.wordId && allWords.some(word => word.id === item.wordId)).map(item => item.wordId!))), [allWords, document, interactions])
   const hasNextContent = readerContents.length > 1
 
@@ -93,6 +113,10 @@ export function Reader({ allWords, progress, interactions, onInteraction, onSave
   }, [document.id, document.text, view])
 
   useEffect(() => {
+    setActiveAudioCue(currentContent.cues?.length ? getActiveCue(currentContent.cues, audioTimeMs) : undefined)
+  }, [audioTimeMs, currentContent])
+
+  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       if (editorOpen) { closeEditor(); return }
@@ -104,6 +128,12 @@ export function Reader({ allWords, progress, interactions, onInteraction, onSave
   })
 
   const persistDocument = (next: ReaderDocument) => { setDocument(next); saveJson(READER_DOCUMENT_KEY, next) }
+
+  const persistAudioState = (progress: number, timeMs: number) => {
+    setAudioProgress(progress)
+    setAudioTimeMs(timeMs)
+    persistDocument({ ...document, audioProgress: progress, audioTimeMs: timeMs })
+  }
 
   const onScroll = () => {
     const node = canvasRef.current
@@ -190,9 +220,39 @@ export function Reader({ allWords, progress, interactions, onInteraction, onSave
   const openContent = (content: ReaderContent) => {
     const next = { ...makeReaderDocument(content.text, content.title), settings: document.settings }
     persistDocument(next)
+    setReviewPack(null)
+    setImportOpen(false)
+    setActiveAudioCue(undefined)
+    setAudioProgress(undefined)
+    setAudioTimeMs(0)
+    setCanvasSize({ scrollHeight: 0, clientHeight: 0 })
     setSelectedToken('')
     setSelectedContext('')
     setView('reading')
+  }
+
+  const openImportedContent = (result: ReaderImportResult) => {
+    const next = { ...makeReaderDocument(result.text, result.title), settings: document.settings, source: 'imported' as const, format: result.format, cues: result.cues, audioUrl: result.audioUrl }
+    persistDocument(next)
+    setImportOpen(false)
+    setReviewPack(null)
+    setActiveAudioCue(undefined)
+    setAudioProgress(undefined)
+    setAudioTimeMs(0)
+    setCanvasSize({ scrollHeight: 0, clientHeight: 0 })
+    setSelectedToken('')
+    setSelectedContext('')
+    setView('reading')
+  }
+
+  const openArticleReview = () => {
+    if (!currentSavedWordIds.length) {
+      onGoReview?.()
+      return
+    }
+    const pack = createArticleReviewPack({ contentId: currentContent.id, title: currentContent.title, savedWordIds: currentSavedWordIds, completedAt: new Date().toISOString(), elapsedSeconds, progress: readerProgress })
+    setReviewPack(pack)
+    saveJson(READER_REVIEW_PACK_KEY, pack)
   }
 
   const openNextContent = () => {
@@ -216,33 +276,40 @@ export function Reader({ allWords, progress, interactions, onInteraction, onSave
     <label htmlFor="reader-setting-font">字体<select id="reader-setting-font" value={document.settings.font} onChange={event => updateSettings({ font: event.target.value as ReaderDocument['settings']['font'] })}><option value="serif">Serif</option><option value="sans">Sans</option></select></label>
   </div>
 
+  const audioControls = <ReaderAudioControls audioUrl={currentContent.audioUrl} cues={currentContent.cues} fallbackText={currentSentence} initialTimeMs={audioTimeMs} onCueChange={setActiveAudioCue} onProgress={persistAudioState}/>
+  const renderReaderWords = (text: string, keyPrefix: string) => text.split(/(\b[A-Za-z][A-Za-z'-]*\b)/g).map((part, index) => {
+    if (!/^[A-Za-z]/.test(part)) return <span key={`${keyPrefix}-${index}`}>{part}</span>
+    const normalized = normalizeReaderToken(part)
+    const selected = normalizedSelected === normalized
+    const saved = savedTokens.has(normalized)
+    const queried = queriedTokens.has(normalized)
+    return <button key={`${keyPrefix}-${index}`} type="button" className={`readerWord ${selected ? 'selected' : ''} ${saved ? 'saved' : ''} ${queried && !saved ? 'queried' : ''}`} onClick={event => openWord(event, part)}>{part}</button>
+  })
+  const activeCueText = activeAudioCue?.text.trim()
+  const activeCueStart = activeCueText ? document.text.indexOf(activeCueText) : -1
+  const renderedReaderText = activeCueStart >= 0 && activeCueText ? <>{renderReaderWords(document.text.slice(0, activeCueStart), 'before-cue')}<span className="readerSentenceActive">{renderReaderWords(activeCueText, 'active-cue')}</span>{renderReaderWords(document.text.slice(activeCueStart + activeCueText.length), 'after-cue')}</> : renderReaderWords(document.text, 'reader')
+
   const readingView = <>
-    <ReaderToolbar content={currentContent} progress={completionProgress} currentSentence={currentSentence} settingsOpen={settingsOpen} onToggleSettings={() => setSettingsOpen(value => !value)} onEdit={openEditor} onLibrary={() => { setSettingsOpen(false); setSelectedToken(''); setView('library') }} editorTriggerRef={editorTriggerRef} settingsPanel={settingsPanel}/>
+    <ReaderToolbar content={currentContent} progress={readerProgress} currentSentence={currentSentence} audioControls={audioControls} examRouteLabel={currentContent.examId ? getExamRouteLabel(currentContent.examId) : undefined} settingsOpen={settingsOpen} onToggleSettings={() => setSettingsOpen(value => !value)} onEdit={openEditor} onLibrary={() => { setSettingsOpen(false); setSelectedToken(''); setReviewPack(null); setView('library') }} editorTriggerRef={editorTriggerRef} settingsPanel={settingsPanel}/>
     {!document.text.trim() ? <section className="readerEmpty"><div className="readerEmptyIcon"><BookOpen size={28}/></div><h2>开始一段英语阅读</h2><p>粘贴一篇你真正想读的英文。Lexora 会在需要时帮助处理生词，但不会打断阅读。</p><button className="primaryButton" type="button" onClick={openEditor}>粘贴 / 编辑文本</button><button className="textButton" type="button" onClick={() => openContent(defaultReaderContent)}>使用示例文章：A Small Habit</button></section> : <div className="readerWorkspace">
       <section className="readerCanvasPanel">
         <div ref={canvasRef} className={`readingCanvas ${document.settings.font}`} style={readingStyle} onScroll={onScroll}>
-          <div className="readingText">{parts.map((part, index) => {
-            if (!/^[A-Za-z]/.test(part)) return <span key={index}>{part}</span>
-            const normalized = normalizeReaderToken(part)
-            const selected = normalizedSelected === normalized
-            const saved = savedTokens.has(normalized)
-            const queried = queriedTokens.has(normalized)
-            return <button key={index} type="button" className={`readerWord ${selected ? 'selected' : ''} ${saved ? 'saved' : ''} ${queried && !saved ? 'queried' : ''}`} onClick={event => openWord(event, part)}>{part}</button>
-          })}</div>
+          <div className="readingText">{renderedReaderText}</div>
         </div>
-        <div className="readerProgressBar" aria-label={`阅读进度 ${completionProgress}%`}><span style={{ width: `${completionProgress}%` }}/></div>
-        <div className="readerProgressMeta"><span>开头</span><strong>{completionProgress}%</strong><span>结尾</span></div>
+        <div className="readerProgressBar" aria-label={`阅读进度 ${readerProgress}%`}><span style={{ width: `${readerProgress}%` }}/></div>
+        <div className="readerProgressMeta"><span>开头</span><strong>{readerProgress}%</strong><span>结尾</span></div>
       </section>
       <aside className={`readerInspector desktopInspector ${selectedToken ? 'visible' : ''}`} aria-live="polite">{selectedToken ? <WordInspector word={selectedWord} token={normalizedSelected} context={selectedContext} saved={isSaved} progress={selectedWord ? progress[selectedWord.id] : undefined} onSave={saveSelectedWord} onClose={closeInspector}/> : <div className="inspectorPlaceholder"><span className="eyebrow">WORD INSPECTOR</span><h2>点一个词，继续阅读。</h2><p>查词、发音与加入学习都放在这里，不占用正文空间。</p></div>}</aside>
     </div>}
-    {document.text.trim() && completionProgress < 100 && canvasSize.scrollHeight > 0 && canvasSize.clientHeight > 0 && canvasSize.scrollHeight <= canvasSize.clientHeight && <section className="readerCompletionPrompt" aria-label="完成阅读操作"><div><span className="eyebrow">SHORT READING</span><p>这篇内容已经完整显示，可以在读完后手动标记完成。</p></div><button className="primaryButton" type="button" onClick={completeReading}>完成阅读</button></section>}
-    {document.text.trim() && completionProgress >= 100 && <ReaderCompletion content={currentContent} progress={completionProgress} elapsedSeconds={elapsedSeconds} encounteredCount={readerStats.encounteredCount} savedCount={readerStats.savedCount} reviewWordCount={currentSavedWordIds.length} onReview={onGoReview ? () => onGoReview(currentSavedWordIds) : undefined} onContinue={openNextContent} hasNext={hasNextContent}/>}
+    {!audioEnabled && document.text.trim() && completionProgress < 100 && canvasSize.scrollHeight > 0 && canvasSize.clientHeight > 0 && canvasSize.scrollHeight <= canvasSize.clientHeight && <section className="readerCompletionPrompt" aria-label="完成阅读操作"><div><span className="eyebrow">SHORT READING</span><p>这篇内容已经完整显示，可以在读完后手动标记完成。</p></div><button className="primaryButton" type="button" onClick={completeReading}>完成阅读</button></section>}
+    {document.text.trim() && readerProgress >= 100 && <ReaderCompletion content={currentContent} progress={readerProgress} elapsedSeconds={elapsedSeconds} encounteredCount={readerStats.encounteredCount} savedCount={readerStats.savedCount} reviewWordCount={currentSavedWordIds.length} onReview={onGoReview ? openArticleReview : undefined} onContinue={openNextContent} hasNext={hasNextContent}/>}
   </>
 
   return <div className="readerPage pageEnter">
-    {view === 'library' ? <ReaderLibrary contents={readerContents} currentContent={currentContent} document={document} onContinue={() => setView('reading')} onSelectContent={openContent} onOpenEditor={openEditor} onUseExample={() => openContent(defaultReaderContent)}/> : readingView}
+    {reviewPack ? <ArticleReviewPackView pack={reviewPack} savedWords={allWords.filter(word => reviewPack.savedWordIds.includes(word.id))} onBack={() => setReviewPack(null)} onOpenReview={() => onGoReview?.(reviewPack.savedWordIds)}/> : view === 'library' ? <ReaderLibrary contents={readerContents} currentContent={currentContent} document={document} onContinue={() => setView('reading')} onSelectContent={openContent} onOpenEditor={openEditor} onOpenImport={() => setImportOpen(true)} importTriggerRef={importTriggerRef} onUseExample={() => openContent(defaultReaderContent)}/> : readingView}
     {selectedToken && view === 'reading' && <div className="readerSheetBackdrop" onMouseDown={event => event.target === event.currentTarget && closeInspector()}><div ref={sheetRef} tabIndex={-1} className="readerSheet" style={{ transform: sheetDrag ? `translateY(${sheetDrag}px)` : undefined }} role="dialog" aria-modal="true" aria-label={`${normalizedSelected} 词汇信息`}><div className="sheetHandle" onPointerDown={beginSheetDrag} onPointerMove={moveSheetDrag} onPointerUp={endSheetDrag} onPointerCancel={() => { sheetDragStart.current = null; setSheetDrag(0) }}/><WordInspector word={selectedWord} token={normalizedSelected} context={selectedContext} saved={isSaved} progress={selectedWord ? progress[selectedWord.id] : undefined} onSave={saveSelectedWord} onClose={closeInspector}/></div></div>}
     {editorOpen && <div className="editorBackdrop" onMouseDown={event => event.target === event.currentTarget && closeEditor()}><section className="readerEditor" role="dialog" aria-modal="true" aria-label="编辑阅读文本"><header><div><span className="eyebrow">EDIT TEXT</span><h2>编辑阅读文本</h2></div><button className="iconOnly" type="button" onClick={closeEditor} aria-label="关闭编辑器"><X size={20}/></button></header><label className="readerEditorTitle">标题<input value={editorTitle} onChange={event => setEditorTitle(event.target.value)} placeholder="我的阅读" /></label><textarea autoFocus value={draft} onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setDraft(event.target.value)} placeholder="粘贴你想阅读的英文文本…"/><footer><span>{draft.trim().split(/\s+/).filter(Boolean).length} words</span><button className="primaryButton" type="button" onClick={saveEditor}>保存并阅读</button></footer></section></div>}
+    <ReaderImportDialog open={importOpen} serviceUrl={readerServiceUrl} onClose={() => { setImportOpen(false); window.setTimeout(() => importTriggerRef.current?.focus(), 0) }} onImported={openImportedContent}/>
   </div>
 }
 

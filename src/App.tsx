@@ -16,6 +16,7 @@ import { appendReviewEvent, type ReviewEvent } from './learning/reviewHistory'
 import { recordLearningDay, type LearningDayRecord } from './learning/learningHistory'
 import { getPlacementQuestions, isPlacementProfile, type PlacementProfile } from './learning/placement'
 import { loadJson, loadMigratedJson, saveJson, todayKey } from './lib/storage'
+import type { SyncState } from './features/sync/client'
 
 const PROGRESS_KEY = 'lexora:word-progress'
 const SETTINGS_KEY = 'lexora:settings'
@@ -74,6 +75,18 @@ export default function App() {
 
   const dailyWords = useMemo(() => dailyPlan.wordIds.map(id => words.find(word => word.id === id)).filter((word): word is Word => Boolean(word)), [dailyPlan])
   const dueWords = useMemo(() => getDueWords(words, progress), [progress])
+  const syncSnapshot = useMemo<SyncState>(() => ({
+    placementProfile,
+    progress,
+    settings,
+    dailyPlan,
+    dailyCompletion,
+    reviewHistory,
+    learningHistory,
+    readerInteractions,
+    readerDocument: loadJson<unknown>(READER_DOCUMENT_KEY, null),
+    readerReviewPack: loadJson<unknown>('lexora:reader-review-pack', null)
+  }), [dailyCompletion, dailyPlan, learningHistory, placementProfile, progress, readerInteractions, reviewHistory, settings])
   const today = todayKey()
   const completedToday = dailyCompletion.date === today && dailyCompletion.completed
   const selectedReviewWords = useMemo(() => {
@@ -159,6 +172,20 @@ export default function App() {
     else setPage('review')
   }
 
+  const applySyncState = (state: SyncState) => {
+    const record = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value))
+    if (record(state.progress)) { setProgress(state.progress as Record<string, WordProgress>); saveJson(PROGRESS_KEY, state.progress) }
+    if (record(state.settings) && typeof state.settings.dailyCount === 'number' && Number.isFinite(state.settings.dailyCount)) { setSettings(state.settings as SettingsState); saveJson(SETTINGS_KEY, state.settings) }
+    if (record(state.dailyPlan) && typeof state.dailyPlan.date === 'string' && typeof state.dailyPlan.count === 'number' && Array.isArray(state.dailyPlan.wordIds) && state.dailyPlan.wordIds.every(id => typeof id === 'string')) { setDailyPlan(state.dailyPlan as DailyPlan); saveJson(DAILY_PLAN_KEY, state.dailyPlan) }
+    if (record(state.dailyCompletion) && typeof state.dailyCompletion.date === 'string' && typeof state.dailyCompletion.completed === 'boolean') { setDailyCompletion(state.dailyCompletion as DailyCompletion); saveJson(DAILY_COMPLETION_KEY, state.dailyCompletion) }
+    if (Array.isArray(state.reviewHistory)) { setReviewHistory(state.reviewHistory as ReviewEvent[]); saveJson(REVIEW_HISTORY_KEY, state.reviewHistory) }
+    if (Array.isArray(state.learningHistory)) { setLearningHistory(state.learningHistory as LearningDayRecord[]); saveJson(LEARNING_HISTORY_KEY, state.learningHistory) }
+    if (Array.isArray(state.readerInteractions)) { setReaderInteractions(state.readerInteractions as ReaderWordInteraction[]); saveJson(READER_INTERACTIONS_KEY, state.readerInteractions) }
+    if (state.placementProfile && isPlacementProfile(state.placementProfile)) { setPlacementProfile(state.placementProfile); saveJson(PLACEMENT_PROFILE_KEY, state.placementProfile) }
+    if (state.readerDocument !== undefined) saveJson(READER_DOCUMENT_KEY, state.readerDocument)
+    if (state.readerReviewPack !== undefined) saveJson('lexora:reader-review-pack', state.readerReviewPack)
+  }
+
   const startDaily = () => {
     setSession(placementProfile ? { mode: 'daily' } : { mode: 'placement' })
   }
@@ -197,6 +224,6 @@ export default function App() {
     {page === 'words' && <div className="pageStack pageEnter"><div className="pageHeading"><div><span className="eyebrow">VOCABULARY</span><h1>单词库</h1><p>浏览词汇和当前学习状态；真正的记忆验证放在 Learn Session 里。</p></div></div><div className="wordGrid">{words.map(word => <WordCard key={word.id} word={word} progress={progress[word.id]}/>)}</div></div>}
     {page === 'review' && <Review allWords={words} progress={progress} history={reviewHistory} dueWords={dueWords} readerInteractions={readerInteractions} onStart={startReview} onGoReader={() => setPage('reader')} onGoWords={() => setPage('words')}/>}
     {page === 'reader' && <Reader allWords={words} progress={progress} interactions={readerInteractions} onInteraction={saveReaderInteraction} onSaveWord={saveReaderWord} onGoReview={openReaderReview}/>}
-    {page === 'my' && <My allWords={words} progress={progress} reviewHistory={reviewHistory} learningHistory={learningHistory} dailyCount={dailyCount} maxDaily={words.length} onCount={updateDailyCount} onReset={resetAll} onStartToday={startDaily} onGoReader={() => setPage('reader')}/>}
+    {page === 'my' && <My allWords={words} progress={progress} reviewHistory={reviewHistory} learningHistory={learningHistory} dailyCount={dailyCount} maxDaily={words.length} onCount={updateDailyCount} onReset={resetAll} onStartToday={startDaily} onGoReader={() => setPage('reader')} syncSnapshot={syncSnapshot} onSyncDownload={applySyncState}/>}
   </main></div>
 }

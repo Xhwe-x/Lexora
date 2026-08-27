@@ -916,3 +916,73 @@ html, body { background: var(--page); color: var(--ink); }
   .readerCompletionActions button { width: 100%; }
   .readerEditorTitle { padding: 15px 18px 0; }
 }
+
+/* Content sync / exam interaction P0-P1 foundations */
+.readerExamRoutes { padding-top: 5px; }
+.readerExamRouteGrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
+.readerExamRoute { min-height: 112px; display: flex; flex-direction: column; align-items: stretch; gap: 9px; border: 1px solid #e0cda8; border-top: 3px solid var(--amber); border-radius: var(--radius-md); padding: 13px; background: var(--amber-soft); color: var(--ink); cursor: pointer; text-align: left; }
+.readerExamRoute:hover, .readerExamRoute.active { border-color: var(--amber); background: #fbf0dd; }
+.readerExamRoute > span { display: flex; flex-direction: column; gap: 4px; }
+.readerExamRoute strong { color: var(--amber); font-size: 12px; }
+.readerExamRoute small { color: #8c7043; font-size: 10px; }
+.readerExamRoute p { margin: auto 0 0; color: #766548; font-size: 10px; line-height: 1.5; }
+.readerImportBackdrop { position: fixed; z-index: 70; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(25,53,44,.28); }
+.readerImportDialog { width: min(670px, 100%); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
+.readerImportDialog header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 19px 21px; border-bottom: 1px solid var(--line); }
+.readerImportDialog header h2 { margin: 6px 0 0; color: var(--ink); font-size: 21px; }
+.readerImportModes { display: flex; gap: 6px; padding: 16px 21px 0; }
+.readerImportModes button { display: inline-flex; align-items: center; gap: 5px; min-height: 35px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 7px 10px; background: var(--surface-muted); color: var(--ink-muted); cursor: pointer; font-size: 11px; }
+.readerImportModes button:hover, .readerImportModes button.active { border-color: var(--tide); background: var(--tide-soft); color: var(--tide); }
+.readerImportTitle, .readerImportInput { display: flex; flex-direction: column; gap: 7px; margin: 15px 21px 0; color: var(--ink-muted); font-size: 11px; }
+.readerImportTitle input, .readerImportInput textarea { border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 10px 11px; background: var(--surface); color: var(--ink); }
+.readerImportInput textarea { min-height: 180px; resize: vertical; line-height: 1.6; }
+.readerImportNote, .readerImportError { margin: 12px 21px 0; padding: 10px 11px; border-left: 3px solid var(--tide); background: var(--tide-soft); color: var(--tide); font-size: 11px; line-height: 1.55; }
+.readerImportError { border-left-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
+.readerImportDialog footer { display: flex; justify-content: flex-end; gap: 8px; padding: 18px 21px 21px; }
+.readerAudioControls { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; color: var(--tide); font-size: 11px; }
+.readerAudioControls audio { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.readerAudioPlay { display: inline-flex; align-items: center; gap: 5px; min-height: 35px; border: 1px solid #9ec8cc; border-radius: var(--radius-sm); padding: 7px 9px; background: var(--tide-soft); color: var(--tide); cursor: pointer; font-size: 11px; }
+.readerAudioPlay:hover { border-color: var(--tide); }
+.readerAudioRate { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-muted); font-size: 10px; }
+.readerAudioRate select { height: 30px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 0 5px; background: var(--surface); color: var(--ink); }
+.readerAudioError { color: var(--danger); font-size: 10px; }
+.readerAudioFallback { color: var(--tide); }
+.syncSettingRow { align-items: flex-start; }
+.syncControls { display: grid; gap: 8px; min-width: min(360px, 100%); }
+.syncControls label { display: grid; gap: 4px; color: var(--ink-muted); font-size: 11px; }
+.syncControls input { min-width: 0; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 8px 9px; background: var(--surface); color: var(--ink); }
+.syncActions { display: flex; flex-wrap: wrap; gap: 7px; }
+.syncStatus { color: var(--ink-muted); font-size: 11px; line-height: 1.45; }
+.readerSentenceActive { border-radius: var(--radius-sm); background: var(--tide-soft); box-shadow: inset 0 -2px 0 rgba(23,107,120,.28); }
+.articleReviewPack { display: flex; flex-direction: column; gap: 18px; }
+.articleReviewBack { align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; }
+.articleReviewHero { padding: 25px; border: 1px solid #b7d1c1; border-left: 3px solid var(--primary); border-radius: var(--radius-lg); background: #f1f8f3; }
+.articleReviewHero h1 { margin: 8px 0; color: var(--ink); font-family: Georgia, serif; font-size: 31px; font-weight: 500; }
+.articleReviewHero p { max-width: 650px; margin: 0; color: var(--ink-muted); font-size: 13px; line-height: 1.65; }
+.articleReviewMeta { display: flex; gap: 15px; margin-top: 17px; color: var(--primary); font-size: 11px; }
+.articleReviewSection { padding: 21px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.articleReviewPrompts { display: flex; flex-direction: column; gap: 9px; margin: 0; padding-left: 22px; }
+.articleReviewPrompts li { padding: 8px 0 8px 5px; color: var(--ink); }
+.articleReviewPrompts li > span { color: var(--tide); font-size: 10px; font-weight: 800; }
+.articleReviewPrompts p { margin: 5px 0 0; color: var(--ink-muted); font-size: 13px; line-height: 1.55; }
+.articleReviewWords { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 15px; }
+.articleReviewWords span { padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-muted); color: var(--ink); font-size: 12px; }
+
+@media (max-width: 900px) {
+  .readerExamRouteGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .readerExamRouteGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .readerExamRoute { min-height: 105px; padding: 11px; }
+  .readerImportBackdrop { padding: 0; align-items: stretch; }
+  .readerImportDialog { width: 100%; min-height: 100dvh; border-radius: 0; }
+  .readerImportModes { flex-wrap: wrap; }
+  .readerImportDialog footer { margin-top: auto; }
+  .readerAudioControls { align-items: flex-start; flex-wrap: wrap; }
+  .syncSettingRow { display: grid; }
+  .syncControls { min-width: 0; }
+  .articleReviewHero { padding: 19px 17px; }
+  .articleReviewHero h1 { font-size: 27px; }
+  .articleReviewSection { padding: 17px 16px; }
+}
