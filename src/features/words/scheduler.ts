@@ -15,7 +15,7 @@ function hashString(input: string) {
 }
 
 function rankForDay(all: Word[], dateKey: string) {
-  return [...all].sort((a, b) => hashString(`${dateKey}:${a.id}`) - hashString(`${dateKey}:${b.id}`))
+  return [...all].sort((a, b) => hashString(`${dateKey}:${a.id}`) - hashString(`${dateKey}:${b.id}`) || a.id.localeCompare(b.id))
 }
 
 export function getDailyWords(all: Word[], count: number, dateKey: string) {
@@ -30,6 +30,64 @@ export function getDailyNewWords(
 ) {
   const newWords = all.filter(word => !progress[word.id] || progress[word.id].status === 'new')
   return rankForDay(newWords, dateKey).slice(0, Math.min(clampDailyCount(count, all.length), newWords.length))
+}
+
+export type PlacementRatios = { dailyRatio: number; examRatio: number }
+
+function dedupeById(words: Word[]) {
+  const seen = new Set<string>()
+  return words.filter(word => {
+    if (seen.has(word.id)) return false
+    seen.add(word.id)
+    return true
+  })
+}
+
+function ratioValue(value: number) {
+  return Number.isFinite(value) ? Math.max(0, value) : 0
+}
+
+export function getDailyNewWordsForProfile(
+  all: Word[],
+  count: number,
+  dateKey: string,
+  progress: Record<string, WordProgress>,
+  { dailyRatio, examRatio }: PlacementRatios
+) {
+  const targetCount = Number.isFinite(count) ? Math.max(0, Math.min(Math.floor(count), all.length)) : 0
+  if (!targetCount) return []
+
+  const newWords = dedupeById(all).filter(word => !progress[word.id] || progress[word.id].status === 'new')
+  const ranked = rankForDay(newWords, dateKey)
+  const dailyWords = ranked.filter(word => word.track === 'daily')
+  const examWords = ranked.filter(word => word.track === 'exam')
+  const sharedWords = ranked.filter(word => !word.track || word.track === 'shared')
+  const safeDailyRatio = ratioValue(dailyRatio)
+  const safeExamRatio = ratioValue(examRatio)
+  const ratioTotal = safeDailyRatio + safeExamRatio
+  const dailyTarget = ratioTotal ? Math.round(targetCount * safeDailyRatio / ratioTotal) : 0
+  const examTarget = ratioTotal ? targetCount - dailyTarget : 0
+  const selected: Word[] = []
+  const selectedIds = new Set<string>()
+
+  const take = (pool: Word[], limit: number) => {
+    let remaining = limit
+    if (remaining <= 0) return
+    for (const word of pool) {
+      if (selected.length >= targetCount || remaining <= 0) break
+      if (selectedIds.has(word.id)) continue
+      selected.push(word)
+      selectedIds.add(word.id)
+      remaining -= 1
+    }
+  }
+
+  take(dailyWords, dailyTarget)
+  take(examWords, examTarget)
+  take(sharedWords, targetCount - selected.length)
+  take(ranked, targetCount - selected.length)
+
+  return selected.slice(0, targetCount)
 }
 
 export function isDue(progress: WordProgress | undefined, now = new Date()) {
@@ -78,3 +136,5 @@ export function rateWord(progress: WordProgress | undefined, correct: boolean, n
     nextReviewAt: next.toISOString()
   }
 }
+
+export default getDailyNewWordsForProfile

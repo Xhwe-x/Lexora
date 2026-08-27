@@ -1,3 +1,5 @@
+export type WordTrack = 'daily' | 'exam' | 'shared'
+
 export type Word = {
   id: string
   en: string
@@ -6,6 +8,7 @@ export type Word = {
   exampleZh: string
   level: 'A1' | 'A2' | 'B1'
   category: '日常' | '学习' | '交流' | '动作' | '描述'
+  track?: WordTrack
 }
 
 export type Familiarity = 'unknown' | 'fuzzy' | 'familiar'

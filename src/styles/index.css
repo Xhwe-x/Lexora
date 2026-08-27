@@ -547,3 +547,127 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 }
 .sheetHandle { touch-action: none; cursor: grab; }
 .sheetHandle:active { cursor: grabbing; }
+
+/* Placement onboarding and dual-track summary */
+.sidebarProfile { margin-top: 24px; padding: 13px 12px; border: 1px solid #e3e9e2; border-radius: 14px; background: rgba(255,255,255,.66); }
+.sidebarProfile > div { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sidebarProfile span, .sidebarProfile small { color: #8a938b; font-size: 10px; }
+.sidebarProfile strong { color: var(--green); font-family: Georgia, serif; font-size: 24px; font-weight: 500; }
+.sidebarProfile p { margin: 7px 0 3px; color: #46574c; font-size: 11px; font-weight: 700; }
+
+.placementShell { min-height: 100dvh; width: 100%; padding: 32px 20px 48px; display: grid; place-items: center; background: radial-gradient(circle at 50% 0%, #fbfcf8 0%, #f5f6f1 58%, #eef2ec 100%); }
+.placementFrame { width: min(760px, 100%); display: flex; flex-direction: column; gap: 18px; }
+.placementGoalFrame { width: min(900px, 100%); }
+.placementResultFrame { width: min(700px, 100%); }
+.placementBrand { display: flex; align-items: center; justify-content: center; gap: 9px; color: #3e5145; font-size: 17px; font-weight: 800; letter-spacing: -.25px; }
+.placementBrandMark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 12px; background: var(--green); color: #fff; box-shadow: 0 6px 18px rgba(32,95,69,.14); }
+.placementCard { border: 1px solid #dfe6de; border-radius: 25px; background: rgba(255,255,255,.94); box-shadow: 0 20px 65px rgba(35,54,41,.075); }
+.placementGoalCard { padding: clamp(28px, 6vw, 58px); text-align: center; }
+.placementEyebrow { color: #6d7c71; font-size: 11px; font-weight: 800; letter-spacing: 1.65px; }
+.placementGoalCard h1 { margin: 16px 0 12px; color: var(--ink); font-family: Georgia, "Songti SC", serif; font-size: clamp(36px, 6vw, 54px); font-weight: 500; letter-spacing: -1.2px; line-height: 1.15; }
+.placementIntro { max-width: 610px; margin: 0 auto; color: var(--muted); line-height: 1.75; }
+.placementGoalGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 31px 0 25px; text-align: left; }
+.placementGoalChoice { min-height: 142px; border: 1px solid #e0e6de; border-radius: 16px; padding: 17px; background: #fbfcfa; color: #4f5a52; cursor: pointer; text-align: left; transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast); }
+.placementGoalChoice:hover { border-color: #b5cabb; background: #f5f9f5; }
+.placementGoalChoice:active { transform: scale(.99); }
+.placementGoalChoice.selected { border-color: #6f9a7d; background: #eff6f0; box-shadow: 0 0 0 2px rgba(76,132,96,.1); }
+.placementGoalChoiceTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #304839; }
+.placementGoalChoiceTop strong { font-size: 16px; }
+.placementGoalChoiceTop svg { color: var(--green); flex: 0 0 auto; }
+.placementGoalChoice > span:last-child { display: block; margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.placementStartButton { min-width: 190px; align-self: center; }
+.placementFinePrint { margin: 17px 0 0; color: #8a938b; font-size: 11px; line-height: 1.6; }
+
+.placementAssessmentFrame { width: min(800px, 100%); }
+.placementAssessmentHeader { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(250px, 360px); align-items: end; gap: 28px; padding: 0 8px; }
+.placementAssessmentHeader .placementBrand { justify-content: flex-start; }
+.placementProgressInfo > div:first-child { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px; color: #6c786f; font-size: 12px; }
+.placementProgressInfo strong { color: #3e5145; }
+.placementProgress { height: 7px; overflow: hidden; border-radius: 999px; background: #e0e6de; }
+.placementProgress span { display: block; height: 100%; border-radius: inherit; background: var(--green); transition: width var(--motion-normal) ease-out; }
+.placementQuestionCard { padding: clamp(25px, 5vw, 46px); }
+.placementQuestionMeta { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: #88918a; font-size: 11px; }
+.placementSkillPill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 999px; background: var(--soft); color: var(--green); font-weight: 700; }
+.placementQuestionCard h1 { max-width: 680px; margin: 34px auto 31px; color: #27362c; font-family: Georgia, "Songti SC", serif; font-size: clamp(28px, 5vw, 42px); font-weight: 500; line-height: 1.35; text-align: center; }
+.placementChoiceGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.placementChoice { min-height: 60px; display: flex; align-items: center; gap: 12px; border: 1px solid #dfe5dd; border-radius: 14px; padding: 13px 15px; background: #fbfcfa; color: #3f4d43; cursor: pointer; text-align: left; transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast); }
+.placementChoice:hover:not(:disabled), .placementChoice.selected { border-color: #91b19d; background: #f0f6f1; }
+.placementChoice:active:not(:disabled) { transform: scale(.99); }
+.placementChoice > span { width: 27px; height: 27px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 8px; background: #edf1ec; color: #79837b; font-size: 12px; font-weight: 700; }
+.placementChoice.selected > span { background: #dcece0; color: var(--green); }
+.placementInputLabel { display: block; color: #69766d; font-size: 12px; }
+.placementInput { width: 100%; margin-top: 9px; border: 1px solid #d8e0d7; border-radius: 13px; padding: 15px 16px; background: #fcfdfb; color: #26352b; font-size: 21px; outline: 0; }
+.placementInput:focus { border-color: #77a088; box-shadow: 0 0 0 4px rgba(54,119,83,.08); }
+.placementRecorded { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 21px 0 0; color: var(--success); font-size: 13px; }
+.placementQuestionActions { display: flex; justify-content: space-between; gap: 10px; margin-top: 32px; }
+.placementQuestionActions .primaryButton { min-width: 145px; }
+.placementAssessmentNote { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; color: #89938b; font-size: 11px; }
+
+.placementResultCard { display: flex; flex-direction: column; align-items: center; padding: clamp(27px, 6vw, 52px); text-align: center; }
+.placementResultIcon { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: 23px; border-radius: 19px; background: var(--success-bg); color: var(--success); }
+.placementResultCard h1 { margin: 14px 0 7px; color: #28392e; font-family: Georgia, "Songti SC", serif; font-size: clamp(38px, 7vw, 56px); font-weight: 500; letter-spacing: -1.2px; }
+.placementBand { margin: 0; color: var(--green); font-size: 14px; font-weight: 800; }
+.placementRecommendation { max-width: 570px; margin: 19px auto 0; color: var(--muted); line-height: 1.75; }
+.placementResultStats { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin: 29px 0 27px; overflow: hidden; border: 1px solid #e4e9e2; border-radius: 15px; background: #e4e9e2; text-align: left; }
+.placementResultStats > div { min-height: 72px; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 13px 15px; background: #fbfcfa; }
+.placementResultStats span { color: #8a938b; font-size: 11px; }
+.placementResultStats strong { color: #3e5145; font-size: 14px; }
+
+.placementOverview { margin-top: 18px; padding: 22px 24px; border: 1px solid #dfe7df; border-radius: 19px; background: linear-gradient(145deg, #fbfcf8, #f1f6f1); box-shadow: 0 10px 30px rgba(35,54,41,.035); }
+.placementOverviewTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 22px; }
+.placementOverviewTop h2 { margin: 7px 0 7px; color: #304437; font-size: 22px; letter-spacing: -.35px; }
+.placementOverviewTop p { max-width: 700px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.placementLevelPill { min-width: 54px; padding: 10px 12px; border-radius: 13px; background: var(--green); color: #fff; font-family: Georgia, serif; font-size: 19px; text-align: center; }
+.placementOverviewMeta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(87,109,93,.14); color: #59675d; font-size: 12px; }
+.placementOverviewMeta span { display: inline-flex; align-items: center; gap: 6px; }
+.placementOverviewMeta b { color: #34463a; }
+.trackSection { margin-top: 27px; }
+.trackGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.trackCard { min-height: 205px; display: flex; flex-direction: column; padding: 20px; border: 1px solid #e1e6df; border-radius: 17px; background: #fff; box-shadow: 0 8px 25px rgba(35,51,40,.025); }
+.trackCard.isPrimary { border-color: #b7cfbc; background: #f8fbf8; box-shadow: 0 10px 30px rgba(45,93,63,.055); }
+.trackCardTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.trackCardTop > div { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.trackBadge { padding: 6px 9px; border-radius: 999px; background: #e7f2e9; color: #2f684a; font-size: 11px; font-weight: 800; }
+.trackCardExam .trackBadge { background: #f3eee3; color: #766345; }
+.trackRole { color: #8a938b; font-size: 11px; }
+.trackCardTop > strong { color: #40584a; font-family: Georgia, serif; font-size: 24px; font-weight: 500; }
+.trackCard h3 { margin: 24px 0 8px; color: #34463a; font-size: 19px; letter-spacing: -.2px; }
+.trackCard p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.trackCardAction { align-self: flex-start; margin-top: auto; min-height: 39px; padding: 8px 12px; font-size: 12px; }
+.trackCardHint { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; color: #718077; font-size: 11px; }
+
+@media (max-width: 900px) {
+  .sidebarProfile { display: none; }
+  .placementAssessmentHeader { grid-template-columns: 1fr; gap: 17px; }
+  .placementAssessmentHeader .placementBrand { justify-content: center; }
+}
+
+@media (max-width: 620px) {
+  .placementShell { padding: 20px 14px calc(28px + env(safe-area-inset-bottom)); }
+  .placementFrame { gap: 14px; }
+  .placementCard { border-radius: 21px; }
+  .placementGoalCard, .placementResultCard { padding: 26px 19px; }
+  .placementGoalCard h1 { font-size: 37px; }
+  .placementGoalGrid { grid-template-columns: 1fr; margin: 25px 0 21px; }
+  .placementGoalChoice { min-height: 0; padding: 15px; }
+  .placementGoalCard .placementStartButton, .placementResultCard .placementStartButton { width: 100%; }
+  .placementAssessmentHeader { padding: 0 3px; }
+  .placementAssessmentHeader .placementBrand { display: none; }
+  .placementQuestionCard { padding: 24px 18px; }
+  .placementQuestionMeta { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .placementQuestionCard h1 { margin: 27px auto 24px; font-size: 29px; }
+  .placementChoiceGrid { grid-template-columns: 1fr; }
+  .placementQuestionActions { flex-direction: column; margin-top: 26px; }
+  .placementQuestionActions button { width: 100%; }
+  .placementOverview { padding: 18px 16px; }
+  .placementOverviewTop { gap: 12px; }
+  .placementOverviewTop h2 { font-size: 20px; }
+  .placementOverviewTop p { font-size: 12px; }
+  .placementOverviewMeta { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .trackGrid { grid-template-columns: 1fr; }
+  .trackCard { min-height: 190px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placementGoalChoice, .placementChoice, .placementProgress span { transition: none; }
+}

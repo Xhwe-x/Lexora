@@ -3,16 +3,18 @@ import { Sidebar, type Page } from './components/Sidebar'
 import { WordCard } from './components/WordCard'
 import { Review } from './components/Review'
 import { Reader } from './components/Reader'
+import { PlacementOnboarding } from './components/PlacementOnboarding'
 import { Home } from './pages/Home'
 import { LearnSession } from './pages/LearnSession'
 import { My } from './pages/My'
 import { words } from './data/words'
-import { clampDailyCount, getDailyNewWords, getDueWords, rateWord } from './features/words/scheduler'
+import { clampDailyCount, getDailyNewWordsForProfile, getDueWords, rateWord } from './features/words/scheduler'
 import type { Word, WordProgress } from './features/words/types'
 import { upsertReaderInteraction, type ReaderWordInteraction } from './features/reader/state'
 import type { SessionItem } from './learning/types'
 import { appendReviewEvent, type ReviewEvent } from './learning/reviewHistory'
 import { recordLearningDay, type LearningDayRecord } from './learning/learningHistory'
+import { getPlacementQuestions, isPlacementProfile, type PlacementProfile } from './learning/placement'
 import { loadJson, loadMigratedJson, saveJson, todayKey } from './lib/storage'
 
 const PROGRESS_KEY = 'lexora:word-progress'
@@ -26,13 +28,16 @@ const READER_DOCUMENT_KEY = 'lexora:reader-document'
 const LEGACY_PROGRESS_KEY = 'english-garden:word-progress'
 const LEGACY_SETTINGS_KEY = 'english-garden:settings'
 const LEGACY_DAILY_PLAN_KEY = 'english-garden:daily-plan'
+const PLACEMENT_PROFILE_KEY = 'lexora:placement-profile'
+const PLACEMENT_QUESTIONS = getPlacementQuestions()
+const DEFAULT_PLACEMENT_RATIOS = { dailyRatio: 60, examRatio: 40 }
 
 type SettingsState = { dailyCount: number }
 type DailyPlan = { date: string; count: number; wordIds: string[] }
 type DailyCompletion = { date: string; completed: boolean }
 type SessionState = { mode: 'daily' } | { mode: 'review'; wordIds?: string[] } | null
 
-function buildDailyPlan(date: string, count: number, progress: Record<string, WordProgress>, previousIds: string[] = [], priorityIds: string[] = []): DailyPlan {
+function buildDailyPlan(date: string, count: number, progress: Record<string, WordProgress>, previousIds: string[] = [], priorityIds: string[] = [], placementProfile: Pick<PlacementProfile, 'dailyRatio' | 'examRatio'> | null = null): DailyPlan {
   const validPrevious = previousIds.filter(id => words.some(word => word.id === id)).slice(0, count)
   const existing = new Set(validPrevious)
   const priority = priorityIds.filter(id => !existing.has(id) && words.some(word => word.id === id) && (!progress[id] || progress[id].status === 'new'))
@@ -40,13 +45,17 @@ function buildDailyPlan(date: string, count: number, progress: Record<string, Wo
   const nextExisting = new Set(withPriority)
   const needed = Math.max(0, count - withPriority.length)
   const candidates = words.filter(word => !nextExisting.has(word.id))
-  const additions = needed ? getDailyNewWords(candidates, needed, date, progress).map(word => word.id) : []
+  const additions = needed ? getDailyNewWordsForProfile(candidates, needed, date, progress, placementProfile ?? DEFAULT_PLACEMENT_RATIOS).map(word => word.id) : []
   return { date, count, wordIds: [...withPriority, ...additions] }
 }
 
 export default function App() {
   const [page, setPage] = useState<Page>('home')
   const [session, setSession] = useState<SessionState>(null)
+  const [placementProfile, setPlacementProfile] = useState<PlacementProfile | null>(() => {
+    const stored = loadJson<unknown>(PLACEMENT_PROFILE_KEY, null)
+    return isPlacementProfile(stored) ? stored : null
+  })
   const [progress, setProgress] = useState<Record<string, WordProgress>>(() => loadMigratedJson(PROGRESS_KEY, LEGACY_PROGRESS_KEY, {}))
   const [settings, setSettings] = useState<SettingsState>(() => loadMigratedJson(SETTINGS_KEY, LEGACY_SETTINGS_KEY, { dailyCount: 8 }))
   const [reviewHistory, setReviewHistory] = useState<ReviewEvent[]>(() => loadJson(REVIEW_HISTORY_KEY, []))
@@ -58,7 +67,7 @@ export default function App() {
   const [dailyPlan, setDailyPlan] = useState<DailyPlan>(() => {
     const date = todayKey()
     const stored = loadMigratedJson<DailyPlan | null>(DAILY_PLAN_KEY, LEGACY_DAILY_PLAN_KEY, null)
-    const plan = buildDailyPlan(date, dailyCount, progress, stored?.date === date ? stored.wordIds : [], readerPriorityIds)
+    const plan = buildDailyPlan(date, dailyCount, progress, stored?.date === date ? stored.wordIds : [], readerPriorityIds, placementProfile)
     saveJson(DAILY_PLAN_KEY, plan)
     return plan
   })
@@ -108,7 +117,7 @@ export default function App() {
     updateSettings({ dailyCount: nextCount })
     setDailyPlan(prev => {
       const date = todayKey()
-      const plan = buildDailyPlan(date, nextCount, progress, prev.date === date ? prev.wordIds : [], readerPriorityIds)
+      const plan = buildDailyPlan(date, nextCount, progress, prev.date === date ? prev.wordIds : [], readerPriorityIds, placementProfile)
       saveJson(DAILY_PLAN_KEY, plan)
       return plan
     })
@@ -144,11 +153,23 @@ export default function App() {
     setSession({ mode: 'review', wordIds: validIds?.length ? validIds : undefined })
   }
 
+  const completePlacement = (profile: PlacementProfile) => {
+    const date = todayKey()
+    const plan = buildDailyPlan(date, dailyCount, progress, [], readerPriorityIds, profile)
+    setPlacementProfile(profile)
+    saveJson(PLACEMENT_PROFILE_KEY, profile)
+    setDailyPlan(plan)
+    saveJson(DAILY_PLAN_KEY, plan)
+    setPage('home')
+  }
+
   const resetAll = () => {
     if (!confirm('确定清除所有本地学习记录吗？')) return
-    ;[PROGRESS_KEY, SETTINGS_KEY, DAILY_PLAN_KEY, REVIEW_HISTORY_KEY, DAILY_COMPLETION_KEY, LEARNING_HISTORY_KEY, READER_INTERACTIONS_KEY, READER_DOCUMENT_KEY, LEGACY_PROGRESS_KEY, LEGACY_SETTINGS_KEY, LEGACY_DAILY_PLAN_KEY].forEach(key => localStorage.removeItem(key))
+    ;[PLACEMENT_PROFILE_KEY, PROGRESS_KEY, SETTINGS_KEY, DAILY_PLAN_KEY, REVIEW_HISTORY_KEY, DAILY_COMPLETION_KEY, LEARNING_HISTORY_KEY, READER_INTERACTIONS_KEY, READER_DOCUMENT_KEY, LEGACY_PROGRESS_KEY, LEGACY_SETTINGS_KEY, LEGACY_DAILY_PLAN_KEY].forEach(key => localStorage.removeItem(key))
     location.reload()
   }
+
+  if (!placementProfile) return <PlacementOnboarding questions={PLACEMENT_QUESTIONS} onComplete={completePlacement}/>
 
   if (session) return <LearnSession
     mode={session.mode}
@@ -160,8 +181,8 @@ export default function App() {
     onRate={recordResult}
   />
 
-  return <div className="appShell"><Sidebar page={page} onChange={setPage}/><main className="mainArea">
-    {page === 'home' && <Home dueCount={dueWords.length} newWords={dailyWords} progress={progress} completedToday={completedToday} onStart={() => setSession({ mode: 'daily' })} onReview={() => dueWords.length > 0 ? startReview(dueWords.map(word => word.id)) : setPage('review')} onSettings={() => setPage('my')}/>}
+  return <div className="appShell"><Sidebar page={page} onChange={setPage} placementProfile={placementProfile}/><main className="mainArea">
+    {page === 'home' && <Home dueCount={dueWords.length} newWords={dailyWords} progress={progress} completedToday={completedToday} placementProfile={placementProfile} onStart={() => setSession({ mode: 'daily' })} onReview={() => dueWords.length > 0 ? startReview(dueWords.map(word => word.id)) : setPage('review')} onWords={() => setPage('words')} onSettings={() => setPage('my')}/>}
     {page === 'words' && <div className="pageStack pageEnter"><div className="pageHeading"><div><span className="eyebrow">VOCABULARY</span><h1>单词库</h1><p>浏览词汇和当前学习状态；真正的记忆验证放在 Learn Session 里。</p></div></div><div className="wordGrid">{words.map(word => <WordCard key={word.id} word={word} progress={progress[word.id]}/>)}</div></div>}
     {page === 'review' && <Review allWords={words} progress={progress} history={reviewHistory} dueWords={dueWords} readerInteractions={readerInteractions} onStart={startReview} onGoReader={() => setPage('reader')} onGoWords={() => setPage('words')}/>}
     {page === 'reader' && <Reader allWords={words} progress={progress} interactions={readerInteractions} onInteraction={saveReaderInteraction} onSaveWord={saveReaderWord}/>}

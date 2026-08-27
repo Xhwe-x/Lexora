@@ -1,5 +1,11 @@
 import type { Word } from '../features/words/types'
 
+function initialTrack(level: string, category: string) {
+  if (level === 'B1' || category === '学习') return 'exam'
+  if (category === '日常' || category === '交流' || category === '动作') return 'daily'
+  return 'shared'
+}
+
 export const words: Word[] = [
   ['ability','ability','能力','Practice improves your ability to speak.','练习会提高你的口语能力。','A2','学习'],
   ['accept','accept','接受','I accept your suggestion.','我接受你的建议。','A2','交流'],
@@ -77,4 +83,4 @@ export const words: Word[] = [
   ['wonder','wonder','想知道','I wonder what this means.','我想知道这是什么意思。','A2','交流'],
   ['write','write','写','Write one sentence with the new word.','用新单词写一个句子。','A1','学习'],
   ['wrong','wrong','错误的','There is nothing wrong with trying again.','再试一次没有什么错。','A1','描述']
-].map(([id,en,zh,example,exampleZh,level,category]) => ({ id,en,zh,example,exampleZh,level,category })) as Word[]
+].map(([id,en,zh,example,exampleZh,level,category]) => ({ id,en,zh,example,exampleZh,level,category,track: initialTrack(level, category) })) as Word[]
